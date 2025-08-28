@@ -37,7 +37,7 @@ public class controladorDetalle_producto {
     }
 
 
-    @PutMapping("/detalle-producto/{id_detalle_producto}")
+    @PutMapping("/detalle_producto/{id_detalle_producto}")
     public String actualizarDetalle_producto(@PathVariable int id_detalle_producto, @RequestBody detalle_producto detalleProducto) {
         Conexion.actualizarDetalle_producto(id_detalle_producto, detalleProducto);
         return "Detalles actualizados correctamente";
