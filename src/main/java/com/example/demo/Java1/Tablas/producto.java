@@ -4,18 +4,20 @@ public class producto {
     private int id_producto;
     private String nombre;
     private String descripcion;
-    private String estado;
-    private int stock;
+    private int cantidad;
     private Double precio;
+    private int id_vendedor;
+    private String estado;
 
-public producto(int id_producto, String nombre, String descripcion, String estado, int stock, Double precio) {
-    this.id_producto = id_producto;
-    this.nombre = nombre;
-    this.descripcion = descripcion;
-    this.estado = estado;
-    this.stock = stock;
-    this.precio = precio;
-}
+    public producto(int id_producto, String nombre, String descripcion, int cantidad, Double precio, int id_vendedor, String estado) {
+        this.id_producto = id_producto;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.cantidad = cantidad;
+        this.precio = precio;
+        this.id_vendedor = id_vendedor;
+        this.estado = estado;
+    }
 
     public int getId_producto() {
         return id_producto;
@@ -41,20 +43,12 @@ public producto(int id_producto, String nombre, String descripcion, String estad
         this.descripcion = descripcion;
     }
 
-    public String getEstado() {
-        return estado;
+    public int getCantidad() {
+        return cantidad;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
     }
 
     public Double getPrecio() {
@@ -63,6 +57,22 @@ public producto(int id_producto, String nombre, String descripcion, String estad
 
     public void setPrecio(Double precio) {
         this.precio = precio;
+    }
+
+    public int getId_vendedor() {
+        return id_vendedor;
+    }
+
+    public void setId_vendedor(int id_vendedor) {
+        this.id_vendedor = id_vendedor;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
 

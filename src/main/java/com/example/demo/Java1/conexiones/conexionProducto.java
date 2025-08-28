@@ -29,9 +29,10 @@ public class conexionProducto {
                         rs.getInt("id_producto"),
                         rs.getString("nombre"),
                         rs.getString("descripcion"),
-                        rs.getString("estado"),
-                        rs.getInt("stock"),
-                        rs.getDouble("precio")
+                        rs.getInt("cantidad"),
+                        rs.getDouble("precio"),
+                        rs.getInt("id_vendedor"),
+                        rs.getString("estado")
                 );
             }
         });
@@ -44,9 +45,10 @@ public class conexionProducto {
         jdbcTemplate.update(sql,
                 Producto.getNombre(),
                 Producto.getDescripcion(),
-                Producto.getEstado(),
-                Producto.getStock(),
-                Producto.getPrecio()
+                Producto.getCantidad(),
+                Producto.getPrecio(),
+                Producto.getId_vendedor(),
+                Producto.getEstado()
         );
     }
 
