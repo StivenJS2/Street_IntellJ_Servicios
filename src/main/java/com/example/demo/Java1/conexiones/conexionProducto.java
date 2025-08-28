@@ -30,7 +30,6 @@ public class conexionProducto {
                         rs.getString("nombre"),
                         rs.getString("descripcion"),
                         rs.getInt("cantidad"),
-                        rs.getDouble("precio"),
                         rs.getInt("id_vendedor"),
                         rs.getString("estado")
                 );
@@ -39,14 +38,13 @@ public class conexionProducto {
     }
 
     public void agregarProducto(producto Producto) {
-        String sql = "INSERT INTO producto (nombre, descripcion, estado, stock, precio)" +
+        String sql = "INSERT INTO producto (nombre, descripcion, cantidad, id_vendedor, estado)" +
                 "VALUES (?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sql,
                 Producto.getNombre(),
                 Producto.getDescripcion(),
                 Producto.getCantidad(),
-                Producto.getPrecio(),
                 Producto.getId_vendedor(),
                 Producto.getEstado()
         );
