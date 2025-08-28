@@ -30,7 +30,7 @@ public class controladorDetalle_producto {
 
     }
 
-    @DeleteMapping("/detalle-producto/{id_detalle_producto}")
+    @DeleteMapping("/detalle_producto/{id_detalle_producto}")
     public String eliminarDetalle_producto(@PathVariable int id_detalle_producto) {
         Conexion.eliminarDetalle_producto(id_detalle_producto);
         return "Datos del producto eliminados correctamente.";
