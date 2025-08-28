@@ -58,11 +58,13 @@ public class conexionDetalle_producto {
 
     @PutMapping("/detalle_producto/{id_detalle_producto}")
     public void actualizarDetalle_producto(@PathVariable int id_detalle_producto, @RequestBody detalle_producto detalleProducto) {
-        String sql = "UPDATE detalle_producto SET talla = ?, color = ?, precio=? WHERE id_detalle_producto = ?";
+        String sql = "UPDATE detalle_producto SET talla = ?, color = ?, id_producto=?, id_categoria=?, precio=? WHERE id_detalle_producto = ?";
         jdbcTemplate.update(sql,
 
                 detalleProducto.getTalla(),
                 detalleProducto.getColor(),
+                detalleProducto.getId_producto(),
+                detalleProducto.getId_categoria(),
                 detalleProducto.getPrecio(),
 
                 id_detalle_producto);
