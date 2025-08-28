@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,8 +28,8 @@ public class conexionCategoria {
             public categoria mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new categoria(
                         rs.getInt("id_categoria"),
-                        rs.getString("nombre"),
-                        rs.getString("descripcion")
+                        rs.getString("nombre")
+
                 );
             }
         });
@@ -33,26 +37,29 @@ public class conexionCategoria {
 
 
     public void agregarCategoria(categoria cat) {
-        String sql = "INSERT INTO categoria (nombre, descripcion) VALUES (?, ?)";
+        String sql = "INSERT INTO categoria (nombre) VALUES (?)";
         jdbcTemplate.update(sql,
-                cat.getNombre(),
-                cat.getDescripcion()
+                cat.getNombre()
+
         );
     }
 
 
+    @DeleteMapping("/categoria/{id_categoria}")
     public void eliminarCategoria(int id_categoria) {
         String sql = "DELETE FROM categoria WHERE id_categoria = ?";
         jdbcTemplate.update(sql, id_categoria);
     }
 
 
-    public void actualizarCategoria(int id_categoria, categoria cat) {
-        String sql = "UPDATE categoria SET nombre=?, descripcion=? WHERE id_categoria=?";
+    @PutMapping("/categoria/{id_categoria}")
+    public void actualizarCategoria(@PathVariable int id_categoria, @RequestBody categoria Categoria) {
+        String sql = "UPDATE categoria SET nombre = ? WHERE id_categoria = ?";
         jdbcTemplate.update(sql,
-                cat.getNombre(),
-                cat.getDescripcion(),
-                id_categoria
-        );
+
+                Categoria.getNombre(),
+
+                id_categoria);
+
     }
 }

@@ -16,7 +16,7 @@ public class conexionPromocion {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Obtener todas las promociones
+
     public List<promocion> obtenerPromociones() {
         String sql = "SELECT * FROM promocion";
         return jdbcTemplate.query(sql, new RowMapper<promocion>() {
@@ -26,15 +26,15 @@ public class conexionPromocion {
                         rs.getInt("id_promocion"),
                         rs.getString("descripcion"),
                         rs.getDouble("descuento"),
-                        rs.getDate("fecha_inicio"),
-                        rs.getDate("fecha_fin"),
+                        rs.getString("fecha_inicio"),
+                        rs.getString("fecha_fin"),
                         rs.getInt("id_producto")
                 );
             }
         });
     }
 
-    // Agregar promoción
+
     public void agregarPromocion(promocion promo) {
         String sql = "INSERT INTO promocion (descripcion, descuento, fecha_inicio, fecha_fin, id_producto) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -47,13 +47,13 @@ public class conexionPromocion {
         );
     }
 
-    // Eliminar promoción
+
     public void eliminarPromocion(int id_promocion) {
         String sql = "DELETE FROM promocion WHERE id_promocion = ?";
         jdbcTemplate.update(sql, id_promocion);
     }
 
-    // Actualizar promoción
+
     public void actualizarPromocion(int id_promocion, promocion promo) {
         String sql = "UPDATE promocion SET descripcion=?, descuento=?, fecha_inicio=?, fecha_fin=?, id_producto=? " +
                 "WHERE id_promocion=?";

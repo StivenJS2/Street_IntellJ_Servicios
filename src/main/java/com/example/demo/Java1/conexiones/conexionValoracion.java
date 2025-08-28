@@ -16,7 +16,7 @@ public class conexionValoracion {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Obtener todas las valoraciones
+
     public List<valoracion> obtenerValoraciones() {
         String sql = "SELECT * FROM valoracion";
         return jdbcTemplate.query(sql, new RowMapper<valoracion>() {
@@ -34,7 +34,7 @@ public class conexionValoracion {
         });
     }
 
-    // Agregar una valoración
+
     public void agregarValoracion(valoracion val) {
         String sql = "INSERT INTO valoracion (id_cliente, id_producto, calificacion, comentario, fecha_valoracion) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -47,13 +47,13 @@ public class conexionValoracion {
         );
     }
 
-    // Eliminar una valoración
+
     public void eliminarValoracion(int id_valoracion) {
         String sql = "DELETE FROM valoracion WHERE id_valoracion = ?";
         jdbcTemplate.update(sql, id_valoracion);
     }
 
-    // Actualizar una valoración
+
     public void actualizarValoracion(int id_valoracion, valoracion val) {
         String sql = "UPDATE valoracion SET id_cliente=?, id_producto=?, calificacion=?, comentario=?, fecha_valoracion=? " +
                 "WHERE id_valoracion=?";

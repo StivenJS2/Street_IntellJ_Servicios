@@ -3,12 +3,10 @@ package com.example.demo.Java1.Tablas;
 public class categoria {
     private int id_categoria;
     private String nombre;
-    private String descripcion;
 
-    public categoria(int id_categoria, String nombre, String descripcion) {
+    public categoria(int id_categoria, String nombre) {
         this.id_categoria = id_categoria;
         this.nombre = nombre;
-        this.descripcion = descripcion;
     }
 
     public int getId_categoria() {
@@ -25,13 +23,5 @@ public class categoria {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
     }
 }
