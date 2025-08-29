@@ -2,16 +2,11 @@ package com.example.demo.Java1.Tablas;
 
 public class carrito {
     private int id_carrito;
-    private int id_detalle_carrito;
-    private int id_producto;
-    private int id_pedido;
-
-    public carrito(int id_carrito, int id_detalle_carrito, int id_producto, int id_pedido) {
-        this.id_carrito = id_carrito;
-        this.id_detalle_carrito = id_detalle_carrito;
-        this.id_producto = id_producto;
-        this.id_pedido = id_pedido;
-    }
+    private int id_cliente;
+    private int id_detalle_producto;
+    private int cantidad;
+    private Double precio_untario;
+    private  Double subtotal;
 
     public int getId_carrito() {
         return id_carrito;
@@ -21,27 +16,55 @@ public class carrito {
         this.id_carrito = id_carrito;
     }
 
-    public int getId_detalle_carrito() {
-        return id_detalle_carrito;
+    public int getId_cliente() {
+        return id_cliente;
     }
 
-    public void setId_detalle_carrito(int id_detalle_carrito) {
-        this.id_detalle_carrito = id_detalle_carrito;
+    public void setId_cliente(int id_cliente) {
+        this.id_cliente = id_cliente;
     }
 
-    public int getId_producto() {
-        return id_producto;
+    public int getId_detalle_producto() {
+        return id_detalle_producto;
     }
 
-    public void setId_producto(int id_producto) {
-        this.id_producto = id_producto;
+    public void setId_detalle_producto(int id_detalle_producto) {
+        this.id_detalle_producto = id_detalle_producto;
     }
 
-    public int getId_pedido() {
-        return id_pedido;
+    public int getCantidad() {
+        return cantidad;
     }
 
-    public void setId_pedido(int id_pedido) {
-        this.id_pedido = id_pedido;
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Double getPrecio_untario() {
+        return precio_untario;
+    }
+
+    public void setPrecio_untario(Double precio_untario) {
+        this.precio_untario = precio_untario;
+    }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public carrito(int id_carrito, int id_cliente, int id_detalle_producto, int cantidad, Double precio_untario, Double subtotal) {
+        this.id_carrito = id_carrito;
+        this.id_cliente = id_cliente;
+        this.id_detalle_producto = id_detalle_producto;
+        this.cantidad = cantidad;
+        this.precio_untario = precio_untario;
+        this.subtotal = subtotal;
+
+
+
     }
 }
