@@ -1,5 +1,6 @@
 package com.example.demo.Java1.conexiones;
 
+import com.example.demo.Java1.Tablas.cliente;
 import com.example.demo.Java1.Tablas.producto;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -7,6 +8,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,5 +57,18 @@ public class conexionProducto {
     public void eliminarProducto(int id_producto) {
         String sql = "DELETE FROM producto WHERE id_producto = ?";
         jdbcTemplate.update(sql, id_producto);
+    }
+
+    @PutMapping("/producto/{id_producto}")
+    public void actualizarProducto(@PathVariable int id_producto, @RequestBody producto  producto) {
+        String sql = "UPDATE producto SET nombre = ?, descripcion = ?,cantidad=?,id_vendedor=?, estado=? WHERE id_producto = ?";
+        jdbcTemplate.update(sql,
+                producto.getNombre(),
+                producto.getDescripcion(),
+                producto.getCantidad(),
+                producto.getId_vendedor(),
+                producto.getEstado(),
+                id_producto);
+
     }
 }

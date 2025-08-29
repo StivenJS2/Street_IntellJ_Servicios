@@ -1,5 +1,6 @@
 package com.example.demo.Java1.controladores;
 
+import com.example.demo.Java1.Tablas.cliente;
 import com.example.demo.Java1.Tablas.producto;
 import com.example.demo.Java1.conexiones.conexionProducto;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,12 @@ public class controladorProducto {
     public String eliminarProducto(@PathVariable int id_producto) {
         Conexion.eliminarProducto(id_producto);
         return "Producto eliminado correctamente.";
+    }
+
+    @PutMapping("/producto/{id_producto}")
+    public String actualizarProducto(@PathVariable int id_producto, @RequestBody producto producto) {
+        Conexion.actualizarProducto(id_producto, producto);
+        return "Producto actualizado con exito";
     }
 }
 
