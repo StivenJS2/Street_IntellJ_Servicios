@@ -33,7 +33,9 @@ public class conexionVendedor {
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("correo_electronico"),
-                        rs.getString("telefono")
+                        rs.getString("telefono"),
+                        rs.getString("contrasena")
+
                 );
 
             }
@@ -42,14 +44,14 @@ public class conexionVendedor {
 
 
     public void agregarVendedor(vendedor Vendedor) {
-        String sql = "INSERT INTO vendedor (nombre, apellido,correo_electronico, telefono ) " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO vendedor (nombre, apellido,correo_electronico, telefono, contrasena ) " +
+                "VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 Vendedor.getNombre(),
                 Vendedor.getApellido(),
                 Vendedor.getCorreo_electronico(),
-
-                Vendedor.getTelefono()
+                Vendedor.getTelefono(),
+                Vendedor.getContrasena()
 
         );
     }
@@ -63,12 +65,13 @@ public class conexionVendedor {
 
     @PutMapping("/vendedor/{id_vendedor}")
     public void actualizarVendedor(@PathVariable int id_vendedor, @RequestBody vendedor Vendedor) {
-        String sql = "UPDATE vendedor SET nombre = ?, apellido = ?,correo_electronico=?,telefono=? WHERE id_vendedor = ?";
+        String sql = "UPDATE vendedor SET nombre = ?, apellido = ?,correo_electronico=?,telefono=?, contrasena=? WHERE id_vendedor = ?";
         jdbcTemplate.update(sql,
                 Vendedor.getNombre(),
                 Vendedor.getApellido(),
                 Vendedor.getCorreo_electronico(),
                 Vendedor.getTelefono(),
+                Vendedor.getContrasena(),
                 id_vendedor);
 
     }
