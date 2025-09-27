@@ -5,7 +5,7 @@ public class carrito {
     private int id_cliente;
     private int id_detalle_producto;
     private int cantidad;
-    private Double precio_untario;
+    private Double precio_unitario;
     private  Double subtotal;
 
     public int getId_carrito() {
@@ -40,12 +40,12 @@ public class carrito {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecio_untario() {
-        return precio_untario;
+    public Double getPrecio_unitario() {
+        return precio_unitario;
     }
 
     public void setPrecio_untario(Double precio_untario) {
-        this.precio_untario = precio_untario;
+        this.precio_unitario = precio_untario;
     }
 
     public Double getSubtotal() {
@@ -61,7 +61,7 @@ public class carrito {
         this.id_cliente = id_cliente;
         this.id_detalle_producto = id_detalle_producto;
         this.cantidad = cantidad;
-        this.precio_untario = precio_untario;
+        this.precio_unitario = precio_untario;
         this.subtotal = subtotal;
 
 

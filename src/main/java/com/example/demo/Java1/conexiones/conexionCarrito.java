@@ -47,7 +47,7 @@ public class conexionCarrito {
                 Carrito.getId_cliente(),
                 Carrito.getId_detalle_producto(),
                 Carrito.getCantidad(),
-                Carrito.getPrecio_untario(),
+                Carrito.getPrecio_unitario(),
                 Carrito.getSubtotal()
 
         );
@@ -67,7 +67,7 @@ public class conexionCarrito {
                 Carrito.getId_cliente(),
                Carrito.getId_detalle_producto(),
                 Carrito.getCantidad(),
-               Carrito.getPrecio_untario(),
+               Carrito.getPrecio_unitario(),
                 Carrito.getSubtotal(),
                 id_carrito);
 
