@@ -5,17 +5,10 @@ public class producto {
     private String nombre;
     private String descripcion;
     private int cantidad;
+    private String imagen;
     private int id_vendedor;
     private String estado;
 
-    public producto(int id_producto, String nombre, String descripcion, int cantidad, int id_vendedor, String estado) {
-        this.id_producto = id_producto;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.cantidad = cantidad;
-        this.id_vendedor = id_vendedor;
-        this.estado = estado;
-    }
 
     public int getId_producto() {
         return id_producto;
@@ -49,6 +42,14 @@ public class producto {
         this.cantidad = cantidad;
     }
 
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
     public int getId_vendedor() {
         return id_vendedor;
     }
@@ -64,5 +65,21 @@ public class producto {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-}
 
+    public producto(int id_producto, String nombre, String descripcion, int cantidad, String imagen, int id_vendedor, String estado) {
+        this.id_producto = id_producto;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.cantidad = cantidad;
+        this.imagen = imagen;
+        this.id_vendedor = id_vendedor;
+        this.estado = estado;
+
+
+
+
+
+
+
+    }
+}
