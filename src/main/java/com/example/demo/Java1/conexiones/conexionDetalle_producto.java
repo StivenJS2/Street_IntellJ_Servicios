@@ -30,6 +30,7 @@ public class conexionDetalle_producto {
                         rs.getInt("id_detalle_producto"),
                         rs.getString("talla"),
                         rs.getString("color"),
+                        rs.getString("imagen"),
                         rs.getInt("id_producto"),
                         rs.getInt("id_categoria"),
                         rs.getDouble("precio")
@@ -39,11 +40,12 @@ public class conexionDetalle_producto {
     }
 
     public void agregarDetalle_producto(detalle_producto detalle_producto) {
-        String sql = "INSERT INTO detalle_producto (talla, color, id_producto, id_categoria, precio) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO detalle_producto (talla, color, imagen, id_producto, id_categoria, precio) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 detalle_producto.getTalla(),
                 detalle_producto.getColor(),
+                detalle_producto.getImagen(),
                 detalle_producto.getId_producto(),
                 detalle_producto.getId_categoria(),
                 detalle_producto.getPrecio()
@@ -58,11 +60,12 @@ public class conexionDetalle_producto {
 
     @PutMapping("/detalle_producto/{id_detalle_producto}")
     public void actualizarDetalle_producto(@PathVariable int id_detalle_producto, @RequestBody detalle_producto detalleProducto) {
-        String sql = "UPDATE detalle_producto SET talla = ?, color = ?, id_producto=?, id_categoria=?, precio=? WHERE id_detalle_producto = ?";
+        String sql = "UPDATE detalle_producto SET talla = ?, color = ?, imagen = ?, id_producto=?, id_categoria=?, precio=? WHERE id_detalle_producto = ?";
         jdbcTemplate.update(sql,
 
                 detalleProducto.getTalla(),
                 detalleProducto.getColor(),
+                detalleProducto.getImagen(),
                 detalleProducto.getId_producto(),
                 detalleProducto.getId_categoria(),
                 detalleProducto.getPrecio(),

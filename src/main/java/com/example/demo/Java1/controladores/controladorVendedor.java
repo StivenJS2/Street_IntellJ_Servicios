@@ -1,6 +1,7 @@
 package com.example.demo.Java1.controladores;
 
 import com.example.demo.Java1.Tablas.vendedor;
+import com.example.demo.Java1.Tablas.login;
 import com.example.demo.Java1.conexiones.conexionVendedor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,4 +42,6 @@ public class controladorVendedor {
         Conexionvendedor.actualizarVendedor(id_vendedor,Vendedor);
         return "Vendedor actualizado con exito";
     }
+
+
 }
