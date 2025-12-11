@@ -26,6 +26,7 @@ public class SeguridadConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
                         .requestMatchers(
                                 "/productos/**",
                                 "/carrito/**",

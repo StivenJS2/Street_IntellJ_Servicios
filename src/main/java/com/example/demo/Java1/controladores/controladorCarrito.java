@@ -21,6 +21,11 @@ public class controladorCarrito {
         return Conexioncarrito.obtenerCarrito();
     }
 
+    @GetMapping("/carrito/cliente/{id_cliente}")
+    public List<carrito> obtenerCarritoPorCliente(@PathVariable int id_cliente) {
+        return Conexioncarrito.obtenerCarritoPorCliente(id_cliente);
+    }
+
     @PostMapping("/carrito")
     public String agregarCarrito(@RequestBody carrito Carrito) {
         Conexioncarrito.agregarCarrito(Carrito);

@@ -39,6 +39,20 @@ public class conexionCarrito {
         });
     }
 
+    public List<carrito> obtenerCarritoPorCliente(int id_cliente) {
+        String sql = "SELECT * FROM carrito WHERE id_cliente = ?";
+        return jdbcTemplate.query(sql, new Object[]{id_cliente}, (rs, rowNum) -> {
+            carrito c = new carrito();
+            c.setId_carrito(rs.getInt("id_carrito"));
+            c.setId_cliente(rs.getInt("id_cliente"));
+            c.setId_detalle_producto(rs.getInt("id_detalle_producto"));
+            c.setCantidad(rs.getInt("cantidad"));
+            c.setPrecio_untario(rs.getDouble("precio_unitario"));
+            c.setSubtotal(rs.getDouble("subtotal"));
+            return c;
+        });
+    }
+
 
     public void agregarCarrito(carrito Carrito ) {
         String sql = "INSERT INTO carrito (id_cliente,id_detalle_producto,cantidad,precio_unitario,subtotal ) " +

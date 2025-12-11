@@ -9,6 +9,9 @@ public class cliente {
     private String telefono;
     private String correo_electronico;
 
+    public cliente() {
+    }
+
     public cliente(int id_cliente, String nombre, String apellido, String contrasena, String direccion, String telefono, String correo_electronico) {
         this.id_cliente = id_cliente;
         this.nombre = nombre;

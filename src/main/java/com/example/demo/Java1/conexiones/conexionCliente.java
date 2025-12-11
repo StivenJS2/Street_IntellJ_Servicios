@@ -37,6 +37,20 @@ public class conexionCliente {
         });
     }
 
+    public cliente obtenerClientePorId(int id_cliente) {
+        String sql = "SELECT * FROM cliente WHERE id_cliente = ?";
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{id_cliente}, (rs, rowNum) -> {
+            cliente c = new cliente();
+            c.setId_cliente(rs.getInt("id_cliente"));
+            c.setNombre(rs.getString("nombre"));
+            c.setApellido(rs.getString("apellido"));
+            c.setCorreo_electronico(rs.getString("correo_electronico"));
+            return c;
+        });
+    }
+
+
     public void agregarUsuario(cliente Cliente) {
         String sql = "INSERT INTO cliente (nombre, apellido, contrasena, direccion, telefono, correo_electronico) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";

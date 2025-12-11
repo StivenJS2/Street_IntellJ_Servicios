@@ -21,6 +21,11 @@ public class controladorCliente {
         return Conexion.obtenerUsuarios();
     }
 
+    @GetMapping("/cliente/{id_cliente}")
+    public cliente obtenerClientePorId(@PathVariable int id_cliente) {
+        return Conexion.obtenerClientePorId(id_cliente);
+    }
+
     @PostMapping("/cliente")
     public String agregarUsuario(@RequestBody cliente Cliente) {
         Conexion.agregarUsuario(Cliente);
