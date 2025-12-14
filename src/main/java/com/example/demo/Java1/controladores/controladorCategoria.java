@@ -5,6 +5,9 @@ import com.example.demo.Java1.conexiones.conexionCategoria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 import java.util.List;
 
@@ -16,11 +19,15 @@ public class controladorCategoria {
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/categoria")
+    @Operation(summary = "Obtener categorias",
+            description = "Devuelve una lista con todos las categorias existentes")
     public List<categoria> obtenerCategorias() {
         return Conexioncategoria.obtenerCategorias();
     }
 
     @PostMapping("/categoria")
+    @Operation(summary = "Agregar categorias",
+            description = "Crea una nueva categoria")
     public String agregarCategoria(@RequestBody categoria Categoria) {
         Conexioncategoria.agregarCategoria(Categoria);
         return "Categoria agregada correctamente.";
@@ -28,6 +35,8 @@ public class controladorCategoria {
     }
 
     @DeleteMapping("/categoria/{id_categoria}")
+    @Operation(summary = "Eliminar categorias",
+            description = "Elimina una categoria")
     public String eliminarCategoria(@PathVariable int id_categoria) {
         Conexioncategoria.eliminarCategoria(id_categoria);
         return "Categoria eliminada correctamente.";
@@ -35,6 +44,8 @@ public class controladorCategoria {
 
 
     @PutMapping("/categoria/{id_categoria}")
+    @Operation(summary = "Actualizar categorias",
+            description = "Actualiza una categoria")
     public String actualizarCategoria(@PathVariable int id_categoria, @RequestBody categoria Categoria) {
         Conexioncategoria.actualizarCategoria(id_categoria, Categoria);
         return "Categoria actualizada con exito";

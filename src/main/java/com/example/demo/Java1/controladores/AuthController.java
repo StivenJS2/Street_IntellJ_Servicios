@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class AuthController {
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping("/login")
+    @Operation(summary = "Login",
+            description = "Permite al usuario iniciar sesión")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
         String correo = credenciales.get("correo_electronico");
         String contrasena = credenciales.get("contrasena");
