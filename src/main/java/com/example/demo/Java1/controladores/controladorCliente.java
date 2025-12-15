@@ -2,65 +2,80 @@ package com.example.demo.Java1.controladores;
 
 import com.example.demo.Java1.Tablas.cliente;
 import com.example.demo.Java1.conexiones.conexionCliente;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/cliente")
 public class controladorCliente {
 
     @Autowired
-    private conexionCliente Conexion;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private conexionCliente conexion;
 
-    @GetMapping("/cliente")
-    @Operation(summary = "Obtener usuarios",
-            description = "Devuelve una lista con todos los usuarios existentes")
+    /* ===== ADMIN ===== */
+
+    @GetMapping
+    @Operation(summary = "Obtener clientes")
     public List<cliente> obtenerUsuarios() {
-        return Conexion.obtenerUsuarios();
+        return conexion.obtenerUsuarios();
     }
 
-    @GetMapping("/cliente/{id_cliente}")
-    @Operation(summary = "Obtener cliente por id",
-            description = "Devuelve el cliente especificado por id")
+    @GetMapping("/{id_cliente}")
+    @Operation(summary = "Obtener cliente por ID")
     public cliente obtenerClientePorId(@PathVariable int id_cliente) {
-        return Conexion.obtenerClientePorId(id_cliente);
+        return conexion.obtenerClientePorId(id_cliente);
     }
 
-    @PostMapping("/cliente")
-    @Operation(summary = "Agregar usuarios",
-            description = "Crea un nuevo usuario")
-    public String agregarUsuario(@RequestBody cliente Cliente) {
-        Conexion.agregarUsuario(Cliente);
+    @PostMapping
+    @Operation(summary = "Agregar cliente")
+    public String agregarUsuario(@RequestBody cliente cliente) {
+        conexion.agregarUsuario(cliente);
         return "Cliente registrado correctamente.";
-
     }
 
-    @DeleteMapping("/cliente/{id_cliente}")
-    @Operation(summary = "Eliminar usuarios",
-            description = "Elimina un usuario")
+    @PutMapping("/{id_cliente}")
+    @Operation(summary = "Actualizar cliente (admin)")
+    public String actualizarCliente(
+            @PathVariable int id_cliente,
+            @RequestBody cliente cliente
+    ) {
+        conexion.actualizarCliente(id_cliente, cliente);
+        return "Cliente actualizado con éxito.";
+    }
+
+    @DeleteMapping("/{id_cliente}")
+    @Operation(summary = "Eliminar cliente")
     public String eliminarCliente(@PathVariable int id_cliente) {
-        Conexion.eliminarCliente(id_cliente);
+        conexion.eliminarCliente(id_cliente);
         return "Cliente eliminado correctamente.";
     }
 
+    /* ===== PERFIL CLIENTE ===== */
 
-    @PutMapping("/cliente/{id_cliente}")
-    @Operation(summary = "Actualizar usuarios",
-            description = "Actualiza un usuario")
-    public String actualizarCliente(@PathVariable int id_cliente, @RequestBody cliente cliente) {
-        Conexion.actualizarCliente(id_cliente, cliente);
-        return "Cliente actualizado con exito";
+    @GetMapping("/perfil")
+    @Operation(summary = "Obtener perfil del cliente autenticado")
+
+    public Map<String, Object> obtenerPerfil(Authentication authentication) {
+        System.out.println("AUTH OBJECT: " + authentication);
+        System.out.println("AUTH NAME: " + authentication.getName());
+        System.out.println("AUTHORITIES: " + authentication.getAuthorities());
+        String correo = authentication.getName();
+        return conexion.obtenerPerfilPorCorreo(correo);
     }
 
-
-
+    @PutMapping("/perfil")
+    @Operation(summary = "Actualizar perfil del cliente autenticado")
+    public String actualizarPerfil(
+            Authentication authentication,
+            @RequestBody Map<String, String> datos
+    ) {
+        String correo = authentication.getName();
+        conexion.actualizarPerfilPorCorreo(correo, datos);
+        return "Perfil actualizado correctamente.";
+    }
 }
-
-

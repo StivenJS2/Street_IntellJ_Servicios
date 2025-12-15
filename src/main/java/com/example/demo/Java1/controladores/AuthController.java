@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,35 +21,32 @@ public class AuthController {
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping("/login")
-    @Operation(summary = "Login",
-            description = "Permite al usuario iniciar sesión")
+    @Operation(summary = "Login", description = "Permite al usuario iniciar sesión")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
         String correo = credenciales.get("correo_electronico");
         String contrasena = credenciales.get("contrasena");
 
-        // Buscar en tabla cliente
         Map<String, Object> usuario = buscarCliente(correo, contrasena);
         if (usuario != null) {
-            String token = jwtUtil.generarToken(correo);
-            Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("token", token);
-            respuesta.put("tipo", "cliente");
-            respuesta.put("usuario", usuario);
-            return ResponseEntity.ok(respuesta);
+            String token = jwtUtil.generarToken(correo, "ROLE_CLIENTE");
+            return ResponseEntity.ok(respuesta(token, "cliente", usuario));
         }
 
-        // Buscar en tabla vendedor (administrador)
         usuario = buscarVendedor(correo, contrasena);
         if (usuario != null) {
-            String token = jwtUtil.generarToken(correo);
-            Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("token", token);
-            respuesta.put("tipo", "administrador");
-            respuesta.put("usuario", usuario);
-            return ResponseEntity.ok(respuesta);
+            String token = jwtUtil.generarToken(correo, "ROLE_ADMIN");
+            return ResponseEntity.ok(respuesta(token, "administrador", usuario));
         }
 
         return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
+    }
+
+    private Map<String, Object> respuesta(String token, String tipo, Map<String, Object> usuario) {
+        Map<String, Object> r = new HashMap<>();
+        r.put("token", token);
+        r.put("tipo", tipo);
+        r.put("usuario", usuario);
+        return r;
     }
 
     private Map<String, Object> buscarCliente(String correo, String contrasena) {

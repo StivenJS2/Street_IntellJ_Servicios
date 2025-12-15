@@ -21,37 +21,35 @@ public class SeguridadConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
+                        // PUBLICOS
                         .requestMatchers("/auth/**").permitAll()
-
-                        // Swagger/OpenAPI
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
 
-                        .requestMatchers(
-                                "/productos/**",
-                                "/carrito/**",
-                                "/pedido/**",
-                                "/detalle_producto/**",
-                                "/categoria/**",
-                                "/cliente/**",
-                                "/promocion/**",
-                                "/valoracion/**",
-                                "/vendedor/**"
-                        ).authenticated()
+                        // PERFIL CLIENTE (ANTES de /cliente/**)
+                        .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasRole("CLIENTE")
+
+                        // ADMIN
+                        .requestMatchers(HttpMethod.GET, "/cliente").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/cliente/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                );
 
         http.addFilterBefore(jwtFiltro, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
+
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
