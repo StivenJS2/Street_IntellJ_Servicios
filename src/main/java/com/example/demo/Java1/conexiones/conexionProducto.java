@@ -1,19 +1,15 @@
 package com.example.demo.Java1.conexiones;
 
-import com.example.demo.Java1.Tablas.cliente;
 import com.example.demo.Java1.Tablas.producto;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class conexionProducto {
@@ -21,29 +17,51 @@ public class conexionProducto {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // 🔹 Productos para las cards
     public List<producto> obtenerProducto() {
         String sql = "SELECT * FROM producto";
         return jdbcTemplate.query(sql, new RowMapper<producto>() {
-
             @Override
             public producto mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new producto(
-
                         rs.getInt("id_producto"),
                         rs.getString("nombre"),
                         rs.getString("descripcion"),
                         rs.getInt("cantidad"),
                         rs.getString("imagen"),
                         rs.getInt("id_vendedor"),
-                        rs.getString("estado")
+                        rs.getString("estado"),
+                        rs.getDouble("precio"),
+                        rs.getString("color")
                 );
             }
         });
     }
 
+    // 🔹 Detalle de producto + tallas (MODAL)
+    public List<Map<String, Object>> obtenerDetalleProducto(int idProducto) {
+
+        String sql = """
+        SELECT 
+            p.nombre,
+            p.descripcion,
+            p.color,
+            p.precio,
+            dp.talla
+        FROM producto p
+        JOIN detalle_producto dp ON dp.id_producto = p.id_producto
+        WHERE p.id_producto = ?
+    """;
+
+        return jdbcTemplate.queryForList(sql, idProducto);
+    }
+
+
     public void agregarProducto(producto Producto) {
-        String sql = "INSERT INTO producto (nombre, descripcion, cantidad, imagen, id_vendedor, estado)" +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = """
+            INSERT INTO producto (nombre, descripcion, cantidad, imagen, id_vendedor, estado, precio, color)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
         jdbcTemplate.update(sql,
                 Producto.getNombre(),
@@ -51,19 +69,23 @@ public class conexionProducto {
                 Producto.getCantidad(),
                 Producto.getImagen(),
                 Producto.getId_vendedor(),
-                Producto.getEstado()
+                Producto.getEstado(),
+                Producto.getPrecio(),
+                Producto.getColor()
         );
     }
 
-    @DeleteMapping("/producto/{id_producto}")
     public void eliminarProducto(int id_producto) {
-        String sql = "DELETE FROM producto WHERE id_producto = ?";
-        jdbcTemplate.update(sql, id_producto);
+        jdbcTemplate.update("DELETE FROM producto WHERE id_producto = ?", id_producto);
     }
 
-    @PutMapping("/producto/{id_producto}")
-    public void actualizarProducto(@PathVariable int id_producto, @RequestBody producto  producto) {
-        String sql = "UPDATE producto SET nombre = ?, descripcion = ?,cantidad=?, imagen=?, id_vendedor=?, estado=? WHERE id_producto = ?";
+    public void actualizarProducto(int id_producto, producto producto) {
+        String sql = """
+            UPDATE producto 
+            SET nombre=?, descripcion=?, cantidad=?, imagen=?, id_vendedor=?, estado=?, precio=?, color=?
+            WHERE id_producto=?
+        """;
+
         jdbcTemplate.update(sql,
                 producto.getNombre(),
                 producto.getDescripcion(),
@@ -71,7 +93,9 @@ public class conexionProducto {
                 producto.getImagen(),
                 producto.getId_vendedor(),
                 producto.getEstado(),
-                id_producto);
-
+                producto.getPrecio(),
+                producto.getColor(),
+                id_producto
+        );
     }
 }

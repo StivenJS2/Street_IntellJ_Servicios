@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
@@ -45,5 +49,33 @@ public class controladorProducto {
         Conexion.actualizarProducto(id_producto, producto);
         return "Producto actualizado con exito";
     }
+
+    @GetMapping("/producto/{id}/detalle")
+    public Map<String, Object> obtenerDetalleProducto(@PathVariable int id) {
+
+        List<Map<String, Object>> filas = Conexion.obtenerDetalleProducto(id);
+
+        if (filas.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Object> respuesta = new HashMap<>();
+
+        respuesta.put("nombre", filas.get(0).get("nombre"));
+        respuesta.put("descripcion", filas.get(0).get("descripcion"));
+        respuesta.put("color", filas.get(0).get("color"));
+        respuesta.put("precio", filas.get(0).get("precio"));
+
+        List<String> tallas = new ArrayList<>();
+        for (Map<String, Object> fila : filas) {
+            tallas.add((String) fila.get("talla"));
+        }
+
+        respuesta.put("tallas", tallas);
+
+        return respuesta;
+    }
+
+
 }
 

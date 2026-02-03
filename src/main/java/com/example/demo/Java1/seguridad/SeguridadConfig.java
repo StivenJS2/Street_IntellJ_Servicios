@@ -27,29 +27,28 @@ public class SeguridadConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // PUBLICOS
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
 
-                        // PERFIL CLIENTE (ANTES de /cliente/**)
+                        .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
+
+
                         .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasRole("CLIENTE")
 
-                        // ADMIN
-                        .requestMatchers(HttpMethod.GET, "/cliente").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/cliente/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/cliente/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 );
 
+
         http.addFilterBefore(jwtFiltro, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
