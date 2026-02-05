@@ -32,7 +32,8 @@ public class conexionProducto {
                         rs.getInt("id_vendedor"),
                         rs.getString("estado"),
                         rs.getDouble("precio"),
-                        rs.getString("color")
+                        rs.getString("color"),
+                        rs.getInt("id_categoria")
                 );
             }
         });
@@ -47,11 +48,11 @@ public class conexionProducto {
             p.descripcion,
             p.color,
             p.precio,
+            p.imagen,
             dp.talla
         FROM producto p
-        JOIN detalle_producto dp ON dp.id_producto = p.id_producto
-        WHERE p.id_producto = ?
-    """;
+        LEFT JOIN detalle_producto dp ON dp.id_producto = p.id_producto
+        WHERE p.id_producto = ? """;
 
         return jdbcTemplate.queryForList(sql, idProducto);
     }
@@ -59,8 +60,8 @@ public class conexionProducto {
 
     public void agregarProducto(producto Producto) {
         String sql = """
-            INSERT INTO producto (nombre, descripcion, cantidad, imagen, id_vendedor, estado, precio, color)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO producto (nombre, descripcion, cantidad, imagen, id_vendedor, estado, precio, color, id_categoria)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         jdbcTemplate.update(sql,
@@ -71,7 +72,8 @@ public class conexionProducto {
                 Producto.getId_vendedor(),
                 Producto.getEstado(),
                 Producto.getPrecio(),
-                Producto.getColor()
+                Producto.getColor(),
+                Producto.getId_categoria()
         );
     }
 
@@ -82,7 +84,7 @@ public class conexionProducto {
     public void actualizarProducto(int id_producto, producto producto) {
         String sql = """
             UPDATE producto 
-            SET nombre=?, descripcion=?, cantidad=?, imagen=?, id_vendedor=?, estado=?, precio=?, color=?
+            SET nombre=?, descripcion=?, cantidad=?, imagen=?, id_vendedor=?, estado=?, precio=?, color=?, id_categoria=?
             WHERE id_producto=?
         """;
 
@@ -95,6 +97,7 @@ public class conexionProducto {
                 producto.getEstado(),
                 producto.getPrecio(),
                 producto.getColor(),
+                producto.getId_categoria(),
                 id_producto
         );
     }

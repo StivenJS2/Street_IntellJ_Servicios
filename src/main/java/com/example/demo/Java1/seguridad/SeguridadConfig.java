@@ -33,10 +33,13 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/detalle_producto/**").permitAll()
+
 
 
                         .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasRole("CLIENTE")
+
 
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")

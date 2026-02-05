@@ -10,6 +10,7 @@ public class producto {
     private String estado;
     private double precio;
     private String color;
+    private int id_categoria;
 
 
     public int getId_producto() {
@@ -74,7 +75,11 @@ public class producto {
 
     public void setColor(String color) {this.color = color; }
 
-    public producto(int id_producto, String nombre, String descripcion, int cantidad, String imagen, int id_vendedor, String estado, double precio, String color) {
+    public int getId_categoria() {return id_categoria; }
+
+    public void setId_categoria(int categoria) {this.id_categoria = id_categoria; }
+
+    public producto(int id_producto, String nombre, String descripcion, int cantidad, String imagen, int id_vendedor, String estado, double precio, String color, int id_categoria) {
         this.id_producto = id_producto;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -84,6 +89,7 @@ public class producto {
         this.estado = estado;
         this.precio = precio;
         this.color = color;
+        this.id_categoria = id_categoria;
 
     }
 }

@@ -5,7 +5,6 @@ public class detalle_producto {
     private String talla;
     private String imagen;
     private int id_producto;
-    private int id_categoria;
     private int cantidad;
 
     public int getId_detalle_producto() {
@@ -40,26 +39,17 @@ public class detalle_producto {
         this.id_producto = id_producto;
     }
 
-    public int getId_categoria() {
-        return id_categoria;
-    }
-
-    public void setId_categoria(int id_categoria) {
-        this.id_categoria = id_categoria;
-    }
-
     public int getCantidad() {return cantidad; }
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
-    public detalle_producto(int id_detalle_producto, String talla, String imagen, int id_producto, int id_categoria, int cantidad) {
+    public detalle_producto(int id_detalle_producto, String talla, String imagen, int id_producto, int cantidad) {
         this.id_detalle_producto = id_detalle_producto;
         this.talla = talla;
         this.imagen = imagen;
         this.id_producto = id_producto;
-        this.id_categoria = id_categoria;
         this.cantidad = cantidad;
 
     }
