@@ -26,15 +26,21 @@ public class AuthController {
         String correo = credenciales.get("correo_electronico");
         String contrasena = credenciales.get("contrasena");
 
+        // Buscar en clientes
         Map<String, Object> usuario = buscarCliente(correo, contrasena);
         if (usuario != null) {
-            String token = jwtUtil.generarToken(correo, "ROLE_CLIENTE");
+            // 👇 Ahora incluimos el id_cliente en el token
+            int idCliente = (int) usuario.get("id_cliente");
+            String token = jwtUtil.generarToken(correo, "ROLE_CLIENTE", idCliente);
             return ResponseEntity.ok(respuesta(token, "cliente", usuario));
         }
 
+        // Buscar en vendedores
         usuario = buscarVendedor(correo, contrasena);
         if (usuario != null) {
-            String token = jwtUtil.generarToken(correo, "ROLE_ADMIN");
+            // 👇 Ahora incluimos el id_vendedor en el token
+            int idVendedor = (int) usuario.get("id_vendedor");
+            String token = jwtUtil.generarToken(correo, "ROLE_ADMIN", idVendedor);
             return ResponseEntity.ok(respuesta(token, "administrador", usuario));
         }
 
