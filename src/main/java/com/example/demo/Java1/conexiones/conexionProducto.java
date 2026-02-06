@@ -57,6 +57,12 @@ public class conexionProducto {
         return jdbcTemplate.queryForList(sql, idProducto);
     }
 
+    // 🔹 Obtener productos por categoría específica
+    public List<Map<String, Object>> obtenerProductosPorCategoria(int idCategoria) {
+        String sql = "SELECT * FROM producto WHERE id_categoria = ? AND estado = 'activo'";
+        return jdbcTemplate.queryForList(sql, idCategoria);
+    }
+
 
     public void agregarProducto(producto Producto) {
         String sql = """

@@ -75,6 +75,11 @@ public class controladorProducto {
         return respuesta;
     }
 
+    @GetMapping("/producto/categoria/{idCategoria}")
+    public List<Map<String, Object>> obtenerProductosPorCategoria(@PathVariable int idCategoria) {
+        return Conexion.obtenerProductosPorCategoria(idCategoria);
+    }
+
 
 }
 
