@@ -53,24 +53,36 @@ public class controladorProducto {
     @GetMapping("/producto/{id}/detalle")
     public Map<String, Object> obtenerDetalleProducto(@PathVariable int id) {
         List<Map<String, Object>> filas = Conexion.obtenerDetalleProducto(id);
+
         if (filas.isEmpty()) {
-            return null;
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Producto no encontrado");
+            return error;
         }
 
         Map<String, Object> respuesta = new HashMap<>();
 
+        // Datos básicos del producto (primera fila)
         respuesta.put("nombre", filas.get(0).get("nombre"));
         respuesta.put("descripcion", filas.get(0).get("descripcion"));
         respuesta.put("color", filas.get(0).get("color"));
         respuesta.put("precio", filas.get(0).get("precio"));
-        respuesta.put("imagen", filas.get(0).get("imagen")); // 👈 AGREGAR ESTA LÍNEA
+        respuesta.put("imagen", filas.get(0).get("imagen"));
 
-        List<String> tallas = new ArrayList<>();
+        // Detalles con tallas e IDs
+        List<Map<String, Object>> detalles = new ArrayList<>();
         for (Map<String, Object> fila : filas) {
-            tallas.add((String) fila.get("talla"));
+            if (fila.get("talla") != null && fila.get("id_detalle_producto") != null) {
+                Map<String, Object> detalle = new HashMap<>();
+                detalle.put("talla", fila.get("talla"));
+                detalle.put("id_detalle_producto", fila.get("id_detalle_producto"));
+                detalles.add(detalle);
+            }
         }
 
-        respuesta.put("tallas", tallas);
+        respuesta.put("detalles", detalles);
+
+        System.out.println("📦 Enviando detalles: " + respuesta);
 
         return respuesta;
     }
