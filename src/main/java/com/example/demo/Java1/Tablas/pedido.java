@@ -6,13 +6,19 @@ public class pedido {
     private String fecha_pedido;
     private Double total;
     private String estado;
+    private String metodo_pago;
+    private String ruta_factura;
+    private String numero_factura;
 
-    public pedido(int id_pedido, int id_cliente, String fecha_pedido, Double total, String estado) {
+    public pedido(int id_pedido, int id_cliente, String fecha_pedido, Double total, String estado, String metodo_pago, String ruta_factura, String numero_factura) {
         this.id_pedido = id_pedido;
         this.id_cliente = id_cliente;
         this.fecha_pedido = fecha_pedido;
         this.total = total;
         this.estado = estado;
+        this.metodo_pago = metodo_pago;
+        this.ruta_factura = ruta_factura;
+        this.numero_factura = numero_factura;
     }
 
     public int getId_pedido() {
@@ -53,5 +59,29 @@ public class pedido {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getMetodo_pago() {
+        return metodo_pago;
+    }
+
+    public void setMetodo_pago(String metodo_pago) {
+        this.metodo_pago = metodo_pago;
+    }
+
+    public String getRuta_factura() {
+        return ruta_factura;
+    }
+
+    public void setRuta_factura(String ruta_factura) {
+        this.ruta_factura = ruta_factura;
+    }
+
+    public String getNumero_factura() {
+        return numero_factura;
+    }
+
+    public void setNumero_factura(String numero_factura) {
+        this.numero_factura = numero_factura;
     }
 }
