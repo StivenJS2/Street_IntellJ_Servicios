@@ -1,6 +1,7 @@
 package com.example.demo.Java1.servicios;
 
 import com.example.demo.Java1.Tablas.pedido;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -9,20 +10,26 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FacturaService {
 
     private static final String FACTURAS_DIR = "uploads/facturas";
+    private static final String STORAGE_PATH = "C:/xampp/htdocs/Street_Laravel/public/storage/";
 
     // Colores - Blanco y Gris
     private static final DeviceRgb COLOR_GRIS_OSCURO = new DeviceRgb(80, 80, 80);
@@ -41,12 +48,12 @@ public class FacturaService {
             String nombreArchivo = "FAC_" + pedido.getId_pedido() + ".pdf";
             String rutaCompleta = Paths.get(FACTURAS_DIR, nombreArchivo).toString();
 
-            // Crear el PDF con márgenes ajustados para que entre en una página
+            // Crear el PDF
             PdfWriter writer = new PdfWriter(rutaCompleta);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
-            // Márgenes reducidos para que entre en una página
+            // Márgenes
             document.setMargins(25, 25, 25, 25);
 
             // ========== ENCABEZADO ==========
@@ -56,13 +63,13 @@ public class FacturaService {
             document.add(new Paragraph("\n").setMarginBottom(5));
             agregarInformacionCliente(document, pedido);
 
-            // ========== TABLA DE PRODUCTOS ==========
+            // ========== TABLA DE PRODUCTOS CON IMÁGENES ==========
             document.add(new Paragraph("\n").setMarginBottom(5));
-            agregarTablaProductos(document, pedido);
+            agregarTablaProductosConImagenes(document, pedido);
 
-            // ========== RESUMEN FINANCIERO (CENTRADO) ==========
+            // ========== RESUMEN FINANCIERO (SIN IVA) ==========
             document.add(new Paragraph("\n").setMarginBottom(5));
-            agregarResumenCentrado(document, pedido);
+            agregarResumenSinIVA(document, pedido);
 
             // ========== PIE DE PÁGINA ==========
             document.add(new Paragraph("\n").setMarginBottom(3));
@@ -99,7 +106,7 @@ public class FacturaService {
 
         // Línea divisoria
         Table lineaDivisoria = new Table(1);
-        lineaDivisoria.setWidth(500);
+        lineaDivisoria.setWidth(UnitValue.createPercentValue(100));
         Cell celdaLinea = new Cell();
         celdaLinea.setBorder(new SolidBorder(COLOR_GRIS_CLARO, 1.5f));
         celdaLinea.setPadding(0);
@@ -110,7 +117,7 @@ public class FacturaService {
         document.add(new Paragraph("\n").setMarginBottom(3));
 
         // Información de factura
-        Table infoFactura = new Table(3).setWidth(500);
+        Table infoFactura = new Table(3).setWidth(UnitValue.createPercentValue(100));
 
         // Columna 1: Tipo de documento
         Cell cell1 = new Cell()
@@ -156,7 +163,7 @@ public class FacturaService {
                 .setMarginBottom(5);
         document.add(titulo);
 
-        Table infoCliente = new Table(2).setWidth(500);
+        Table infoCliente = new Table(2).setWidth(UnitValue.createPercentValue(100));
 
         // ID Cliente
         agregarFilaInfo(infoCliente, "ID Cliente:", String.valueOf(pedido.getId_cliente()));
@@ -195,15 +202,186 @@ public class FacturaService {
         table.addCell(celdaValor);
     }
 
-    private void agregarTablaProductos(Document document, pedido pedido) throws Exception {
+    /**
+     * 🆕 NUEVA FUNCIÓN: Tabla de productos con imágenes y detalles completos
+     */
+    private void agregarTablaProductosConImagenes(Document document, pedido pedido) throws Exception {
         Paragraph titulo = new Paragraph("DETALLE DE COMPRA")
                 .setFontSize(10)
                 .setFontColor(COLOR_GRIS_OSCURO)
                 .setMarginBottom(5);
         document.add(titulo);
 
-        // Tabla con detalles
-        Table tablaProductos = new Table(3).setWidth(500);
+        // Verificar si hay items
+        List<Map<String, Object>> items = pedido.getItems();
+
+        if (items == null || items.isEmpty()) {
+            // Fallback: mostrar tabla simple si no hay items
+            agregarTablaProductosSimple(document, pedido);
+            return;
+        }
+
+        // Tabla: Imagen | Descripción | Cantidad | Precio Unit. | Subtotal
+        float[] columnWidths = {60, 180, 60, 80, 80}; // Anchos en puntos
+        Table tablaProductos = new Table(columnWidths).setWidth(UnitValue.createPercentValue(100));
+
+        // Encabezados
+        String[] encabezados = {"IMAGEN", "DESCRIPCIÓN", "CANT.", "PRECIO UNIT.", "SUBTOTAL"};
+        for (String encabezado : encabezados) {
+            Cell celdaEncabezado = new Cell()
+                    .add(new Paragraph(encabezado)
+                            .setFontSize(8)
+                            .setFontColor(ColorConstants.WHITE))
+                    .setBackgroundColor(COLOR_GRIS_OSCURO)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setPadding(5)
+                    .setBorder(Border.NO_BORDER);
+            tablaProductos.addCell(celdaEncabezado);
+        }
+
+        // Filas de productos
+        for (Map<String, Object> item : items) {
+            agregarFilaProducto(tablaProductos, item);
+        }
+
+        document.add(tablaProductos);
+    }
+
+    /**
+     * Agregar una fila de producto con imagen
+     */
+    private void agregarFilaProducto(Table table, Map<String, Object> item) {
+        try {
+            // Extraer datos del item
+            String nombre = (String) item.getOrDefault("nombre", "Producto");
+            int cantidad = ((Number) item.getOrDefault("cantidad", 1)).intValue();
+            double precioUnitario = ((Number) item.getOrDefault("precio_unitario", 0.0)).doubleValue();
+            double subtotal = ((Number) item.getOrDefault("subtotal", 0.0)).doubleValue();
+            String talla = (String) item.getOrDefault("talla", "N/A");
+            String color = (String) item.getOrDefault("color", "N/A");
+            String rutaImagen = (String) item.getOrDefault("imagen", "");
+
+            // 1. CELDA DE IMAGEN
+            Cell celdaImagen = new Cell();
+            celdaImagen.setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f));
+            celdaImagen.setPadding(5);
+            celdaImagen.setTextAlignment(TextAlignment.CENTER);
+
+            try {
+                Image imagen = obtenerImagenProducto(rutaImagen);
+                if (imagen != null) {
+                    imagen.setWidth(50);
+                    imagen.setHeight(50);
+                    imagen.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    celdaImagen.add(imagen);
+                } else {
+                    celdaImagen.add(new Paragraph("Sin\nImagen")
+                            .setFontSize(7)
+                            .setFontColor(COLOR_GRIS_MEDIO)
+                            .setTextAlignment(TextAlignment.CENTER));
+                }
+            } catch (Exception e) {
+                celdaImagen.add(new Paragraph("❌")
+                        .setFontSize(20)
+                        .setTextAlignment(TextAlignment.CENTER));
+            }
+
+            // 2. CELDA DE DESCRIPCIÓN
+            Cell celdaDescripcion = new Cell();
+            celdaDescripcion.add(new Paragraph(nombre)
+                    .setFontSize(9)
+                    .setFontColor(COLOR_GRIS_OSCURO));
+            celdaDescripcion.add(new Paragraph("Talla: " + talla + " | Color: " + color)
+                    .setFontSize(7)
+                    .setFontColor(COLOR_GRIS_MEDIO));
+            celdaDescripcion.setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f));
+            celdaDescripcion.setPadding(7);
+
+            // 3. CELDA DE CANTIDAD
+            Cell celdaCantidad = new Cell()
+                    .add(new Paragraph(String.valueOf(cantidad))
+                            .setFontSize(9)
+                            .setFontColor(COLOR_GRIS_OSCURO))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f))
+                    .setPadding(7);
+
+            // 4. CELDA DE PRECIO UNITARIO
+            Cell celdaPrecioUnit = new Cell()
+                    .add(new Paragraph("$" + String.format("%,.2f", precioUnitario))
+                            .setFontSize(9)
+                            .setFontColor(COLOR_GRIS_OSCURO))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f))
+                    .setPadding(7);
+
+            // 5. CELDA DE SUBTOTAL
+            Cell celdaSubtotal = new Cell()
+                    .add(new Paragraph("$" + String.format("%,.2f", subtotal))
+                            .setFontSize(9)
+                            .setFontColor(COLOR_GRIS_OSCURO))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f))
+                    .setPadding(7);
+
+            // Agregar celdas a la tabla
+            table.addCell(celdaImagen);
+            table.addCell(celdaDescripcion);
+            table.addCell(celdaCantidad);
+            table.addCell(celdaPrecioUnit);
+            table.addCell(celdaSubtotal);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al agregar fila de producto: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Obtener imagen del producto desde la ruta de storage
+     */
+    private Image obtenerImagenProducto(String rutaImagen) {
+        if (rutaImagen == null || rutaImagen.isEmpty()) {
+            return null;
+        }
+
+        try {
+            // Construir ruta completa
+            String rutaCompleta;
+
+            // Si la ruta ya incluye "uploads/"
+            if (rutaImagen.startsWith("uploads/")) {
+                rutaCompleta = rutaImagen;
+            }
+            // Si la ruta empieza con "storage/"
+            else if (rutaImagen.startsWith("storage/")) {
+                rutaCompleta = STORAGE_PATH + rutaImagen.substring(8); // Remover "storage/"
+            }
+            // Si es solo el nombre del archivo
+            else {
+                rutaCompleta = STORAGE_PATH + rutaImagen;
+            }
+
+            File archivoImagen = new File(rutaCompleta);
+
+            if (!archivoImagen.exists()) {
+                System.err.println("⚠️ Imagen no encontrada: " + rutaCompleta);
+                return null;
+            }
+
+            return new Image(ImageDataFactory.create(rutaCompleta));
+
+        } catch (MalformedURLException e) {
+            System.err.println("❌ Error al cargar imagen: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Tabla simple de productos (fallback si no hay items)
+     */
+    private void agregarTablaProductosSimple(Document document, pedido pedido) throws Exception {
+        Table tablaProductos = new Table(3).setWidth(UnitValue.createPercentValue(100));
 
         // Encabezados
         String[] encabezados = {"DESCRIPCIÓN", "CANTIDAD", "VALOR TOTAL"};
@@ -230,17 +408,15 @@ public class FacturaService {
         Cell celdaCantidad = new Cell()
                 .add(new Paragraph("1")
                         .setFontSize(9)
-                        .setFontColor(COLOR_GRIS_OSCURO)
-                        .setTextAlignment(TextAlignment.CENTER))
+                        .setFontColor(COLOR_GRIS_OSCURO))
                 .setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f))
                 .setPadding(7)
                 .setTextAlignment(TextAlignment.CENTER);
 
         Cell celdaValor = new Cell()
-                .add(new Paragraph("$" + String.format("%.2f", pedido.getTotal()))
+                .add(new Paragraph("$" + String.format("%,.2f", pedido.getTotal()))
                         .setFontSize(9)
-                        .setFontColor(COLOR_GRIS_OSCURO)
-                        .setTextAlignment(TextAlignment.RIGHT))
+                        .setFontColor(COLOR_GRIS_OSCURO))
                 .setBorder(new SolidBorder(COLOR_GRIS_CLARO, 0.5f))
                 .setPadding(7)
                 .setTextAlignment(TextAlignment.RIGHT);
@@ -252,25 +428,24 @@ public class FacturaService {
         document.add(tablaProductos);
     }
 
-    private void agregarResumenCentrado(Document document, pedido pedido) throws Exception {
-        // Tabla de resumen CENTRADA
+    /**
+     * 🆕 RESUMEN SIN IVA
+     */
+    private void agregarResumenSinIVA(Document document, pedido pedido) throws Exception {
         Table tablaResumen = new Table(2).setWidth(280).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
         double subtotal = pedido.getTotal();
-        double iva = subtotal * 0.19; // 19% IVA Colombia
-        double total = subtotal + iva;
+        double envio = 0.0; // Envío gratis
+        double total = subtotal + envio;
 
         // Subtotal
-        agregarFilaResumen(tablaResumen, "SUBTOTAL", String.format("$%.2f", subtotal), false);
-
-        // IVA
-        agregarFilaResumen(tablaResumen, "IVA (19%)", String.format("$%.2f", iva), false);
+        agregarFilaResumen(tablaResumen, "SUBTOTAL", String.format("$%,.2f", subtotal), false);
 
         // Envío
         agregarFilaResumen(tablaResumen, "ENVÍO", "GRATIS", false);
 
-        // Total
-        agregarFilaResumen(tablaResumen, "TOTAL", String.format("$%.2f", total), true);
+        // Total (sin IVA)
+        agregarFilaResumen(tablaResumen, "TOTAL", String.format("$%,.2f", total), true);
 
         document.add(tablaResumen);
     }
@@ -299,7 +474,7 @@ public class FacturaService {
 
     private void agregarPieDePageina(Document document) throws Exception {
         // Línea divisoria
-        Table lineaFinal = new Table(1).setWidth(500);
+        Table lineaFinal = new Table(1).setWidth(UnitValue.createPercentValue(100));
         Cell celdaLinea = new Cell();
         celdaLinea.setBorder(new SolidBorder(COLOR_GRIS_CLARO, 1));
         celdaLinea.setPadding(0);
@@ -328,7 +503,7 @@ public class FacturaService {
         document.add(contacto);
 
         // Línea divisoria final
-        Table lineaFinal2 = new Table(1).setWidth(500);
+        Table lineaFinal2 = new Table(1).setWidth(UnitValue.createPercentValue(100));
         Cell celdaLinea2 = new Cell();
         celdaLinea2.setBorder(new SolidBorder(COLOR_GRIS_CLARO, 1));
         celdaLinea2.setPadding(0);
