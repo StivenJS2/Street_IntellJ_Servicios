@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Service
@@ -209,5 +212,82 @@ public class conexionPedido {
             LOGGER.warning("⚠️ Error al obtener pedidos del cliente: " + id_cliente);
             return List.of();
         }
+    }
+
+    @Transactional
+    public Map<String, Object> confirmarPedido(pedido nuevoPedido, int idCliente) {
+        Map<String, Object> resultado = new HashMap<>();
+
+        try {
+            LOGGER.info("🔹 Iniciando confirmación de pedido para cliente: " + idCliente);
+
+            // 1️⃣ Validar que el carrito tenga items
+            String sqlValidarCarrito = """
+            SELECT COUNT(*) 
+            FROM carrito c
+            INNER JOIN detalle_carrito dc ON c.id_carrito = dc.id_carrito
+            WHERE c.id_cliente = ?
+        """;
+
+            Integer cantidadItems = jdbcTemplate.queryForObject(sqlValidarCarrito, Integer.class, idCliente);
+
+            if (cantidadItems == null || cantidadItems == 0) {
+                resultado.put("exito", false);
+                resultado.put("mensaje", "El carrito está vacío");
+                return resultado;
+            }
+
+            // 2️⃣ Validar stock ANTES de crear el pedido
+            String sqlValidarStock = """
+            SELECT 
+                p.nombre,
+                dp.talla,
+                dc.cantidad as cantidad_solicitada,
+                dp.cantidad as stock_disponible
+            FROM carrito c
+            INNER JOIN detalle_carrito dc ON c.id_carrito = dc.id_carrito
+            INNER JOIN detalle_producto dp ON dc.id_detalle_producto = dp.id_detalle_producto
+            INNER JOIN producto p ON dp.id_producto = p.id_producto
+            WHERE c.id_cliente = ?
+              AND dp.cantidad < dc.cantidad
+        """;
+
+            List<Map<String, Object>> itemsSinStock = jdbcTemplate.queryForList(sqlValidarStock, idCliente);
+
+            if (!itemsSinStock.isEmpty()) {
+                List<String> erroresStock = new ArrayList<>();
+                for (Map<String, Object> item : itemsSinStock) {
+                    erroresStock.add(String.format(
+                            "%s (Talla %s): Solicitado %d, Disponible %d",
+                            item.get("nombre"),
+                            item.get("talla"),
+                            item.get("cantidad_solicitada"),
+                            item.get("stock_disponible")
+                    ));
+                }
+
+                resultado.put("exito", false);
+                resultado.put("mensaje", "Stock insuficiente");
+                resultado.put("detalles", erroresStock);
+                LOGGER.warning("❌ Stock insuficiente: " + erroresStock);
+                return resultado;
+            }
+
+            // 3️⃣ Crear el pedido (el trigger hace el resto automáticamente)
+            LOGGER.info("🔹 Creando pedido... El trigger descontará stock y vaciará carrito");
+            agregarPedido(nuevoPedido);
+
+            resultado.put("exito", true);
+            resultado.put("mensaje", "Pedido confirmado exitosamente");
+            LOGGER.info("✅ Pedido confirmado para cliente: " + idCliente);
+
+        } catch (Exception e) {
+            resultado.put("exito", false);
+            resultado.put("mensaje", "Error al procesar pedido: " + e.getMessage());
+            LOGGER.severe("❌ Error al confirmar pedido: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return resultado;
     }
 }

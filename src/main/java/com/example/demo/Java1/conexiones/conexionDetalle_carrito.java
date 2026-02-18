@@ -16,42 +16,48 @@ public class conexionDetalle_carrito {
 
     public int agregarProducto(int idCliente, int idDetalleProducto, int cantidad, double precioUnitario) {
         System.out.println("🔹 conexionDetalleCarrito.agregarProducto INICIO");
-        System.out.println("   - idCliente: " + idCliente);
-        System.out.println("   - idDetalleProducto: " + idDetalleProducto);
-        System.out.println("   - cantidad: " + cantidad);
-        System.out.println("   - precioUnitario: " + precioUnitario);
 
-        // 1. Obtener o crear carrito del cliente
-        System.out.println("🔹 Obteniendo o creando carrito...");
+        // ✅ CORREGIDO: Cambiar "stock" por "cantidad"
+        String sqlStock = "SELECT cantidad FROM detalle_producto WHERE id_detalle_producto = ?";
+        try {
+            Integer stockDisponible = jdbcTemplate.queryForObject(sqlStock, Integer.class, idDetalleProducto);
+
+            if (stockDisponible == null || stockDisponible < cantidad) {
+                System.out.println("❌ Stock insuficiente. Disponible: " + stockDisponible + ", Solicitado: " + cantidad);
+                return -1; // Código de error para stock insuficiente
+            }
+
+            System.out.println("✅ Stock disponible: " + stockDisponible);
+        } catch (Exception e) {
+            System.err.println("❌ Error al verificar stock: " + e.getMessage());
+            return -1;
+        }
+
+        // ... resto de tu código actual
         int idCarrito = conexionCarrito.obtenerOCrearCarrito(idCliente);
-        System.out.println("🔹 ID Carrito obtenido: " + idCarrito);
 
-        // 2. Verificar si el producto ya está en el carrito
         String sqlVerificar = """
         SELECT id_detalle_carrito, cantidad 
         FROM detalle_carrito 
         WHERE id_carrito = ? AND id_detalle_producto = ?
     """;
 
-        System.out.println("🔹 Verificando si producto ya existe en carrito...");
-        System.out.println("   SQL: " + sqlVerificar);
-        System.out.println("   Params: idCarrito=" + idCarrito + ", idDetalleProducto=" + idDetalleProducto);
-
         try {
-            // Ya existe, actualizar cantidad
             Map<String, Object> existente = jdbcTemplate.queryForMap(sqlVerificar, idCarrito, idDetalleProducto);
 
-            System.out.println("🔹 Producto YA EXISTE en carrito: " + existente);
-
-            int idDetalleCarrito = (int) existente.get("id_detalle_carrito");
             int cantidadActual = (int) existente.get("cantidad");
             int nuevaCantidad = cantidadActual + cantidad;
-            double nuevoSubtotal = nuevaCantidad * precioUnitario;
 
-            System.out.println("🔹 Actualizando cantidad:");
-            System.out.println("   - Cantidad actual: " + cantidadActual);
-            System.out.println("   - Nueva cantidad: " + nuevaCantidad);
-            System.out.println("   - Nuevo subtotal: " + nuevoSubtotal);
+            // ✅ CORREGIDO: Validar que la nueva cantidad no supere el stock
+            Integer stockDisponible = jdbcTemplate.queryForObject(sqlStock, Integer.class, idDetalleProducto);
+            if (nuevaCantidad > stockDisponible) {
+                System.out.println("❌ Cantidad total supera stock. Stock: " + stockDisponible + ", Total solicitado: " + nuevaCantidad);
+                return -2; // Código para "supera stock al actualizar"
+            }
+
+            // ... resto del UPDATE
+            int idDetalleCarrito = (int) existente.get("id_detalle_carrito");
+            double nuevoSubtotal = nuevaCantidad * precioUnitario;
 
             String sqlActualizar = """
             UPDATE detalle_carrito 
@@ -59,10 +65,7 @@ public class conexionDetalle_carrito {
             WHERE id_detalle_carrito = ?
         """;
 
-            int resultado = jdbcTemplate.update(sqlActualizar, nuevaCantidad, nuevoSubtotal, idDetalleCarrito);
-            System.out.println("🔹 Resultado UPDATE: " + resultado);
-
-            return resultado;
+            return jdbcTemplate.update(sqlActualizar, nuevaCantidad, nuevoSubtotal, idDetalleCarrito);
 
         } catch (Exception e) {
             // No existe, insertar nuevo
@@ -112,7 +115,8 @@ public class conexionDetalle_carrito {
                 p.color,
                 p.precio AS precio_actual,
                 dp.talla,
-                dp.id_detalle_producto
+                dp.id_detalle_producto,
+                dp.cantidad as stock_disponible
             FROM carrito c
             INNER JOIN detalle_carrito dc ON c.id_carrito = dc.id_carrito
             INNER JOIN detalle_producto dp ON dc.id_detalle_producto = dp.id_detalle_producto
@@ -152,14 +156,39 @@ public class conexionDetalle_carrito {
 
     // 🆕 Actualizar cantidad de un item
     public int actualizarCantidad(int idDetalleCarrito, int cantidad) {
-        String sql = """
+        // ✅ Obtener el id_detalle_producto y validar stock
+        String sqlObtenerDetalle = """
+        SELECT id_detalle_producto 
+        FROM detalle_carrito 
+        WHERE id_detalle_carrito = ?
+    """;
+
+        try {
+            Integer idDetalleProducto = jdbcTemplate.queryForObject(sqlObtenerDetalle, Integer.class, idDetalleCarrito);
+
+            // ✅ CORREGIDO: Verificar stock con columna "cantidad"
+            String sqlStock = "SELECT cantidad FROM detalle_producto WHERE id_detalle_producto = ?";
+            Integer stockDisponible = jdbcTemplate.queryForObject(sqlStock, Integer.class, idDetalleProducto);
+
+            if (stockDisponible == null || stockDisponible < cantidad) {
+                System.out.println("❌ Stock insuficiente al actualizar. Disponible: " + stockDisponible + ", Solicitado: " + cantidad);
+                return -1;
+            }
+
+            // Actualizar si hay stock suficiente
+            String sql = """
             UPDATE detalle_carrito 
             SET cantidad = ?,
                 subtotal = cantidad * precio_unitario
             WHERE id_detalle_carrito = ?
         """;
 
-        return jdbcTemplate.update(sql, cantidad, idDetalleCarrito);
+            return jdbcTemplate.update(sql, cantidad, idDetalleCarrito);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al actualizar cantidad: " + e.getMessage());
+            return -1;
+        }
     }
 
     // 🆕 Eliminar item del carrito

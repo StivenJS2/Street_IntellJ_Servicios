@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class controladorPedido {
@@ -39,9 +41,73 @@ public class controladorPedido {
         return Conexionpedido.obtenerPedido();
     }
 
+    /**
+     * ✅ NUEVO ENDPOINT: Confirmar pedido con validación de stock
+     */
+    @PostMapping("/pedido/confirmar")
+    @Operation(summary = "Confirmar pedido con validación de stock",
+            description = "Valida el stock, crea el pedido, descuenta inventario y genera factura")
+    public ResponseEntity<Map<String, Object>> confirmarPedido(@RequestBody pedido Pedido) {
+        Map<String, Object> respuesta = new HashMap<>();
+
+        try {
+            // 1️⃣ Validar y confirmar pedido (esto valida stock y descuenta)
+            Map<String, Object> resultadoConfirmacion = Conexionpedido.confirmarPedido(Pedido, Pedido.getId_cliente());
+
+            // 2️⃣ Verificar si hubo errores de stock
+            if (!(boolean) resultadoConfirmacion.get("exito")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultadoConfirmacion);
+            }
+
+            // 3️⃣ Obtener el ID del pedido recién creado
+            pedido pedidoCreado = Conexionpedido.obtenerUltimoPedidoPorCliente(Pedido.getId_cliente());
+
+            if (pedidoCreado == null) {
+                respuesta.put("exito", false);
+                respuesta.put("mensaje", "Error al obtener el pedido creado");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+            }
+
+            // 4️⃣ Actualizar el objeto pedido con el ID
+            Pedido.setId_pedido(pedidoCreado.getId_pedido());
+
+            // 5️⃣ Generar la factura en PDF
+            String rutaFactura = facturaService.generarFactura(Pedido);
+
+            // 6️⃣ Actualizar la ruta de la factura en la base de datos
+            if (rutaFactura != null) {
+                Conexionpedido.actualizarRutaFactura(Pedido.getId_pedido(), rutaFactura);
+                System.out.println("✅ Factura generada y guardada: " + rutaFactura);
+            }
+
+            // 7️⃣ Retornar respuesta exitosa
+            respuesta.put("exito", true);
+            respuesta.put("id_pedido", Pedido.getId_pedido());
+            respuesta.put("numero_factura", Pedido.getNumero_factura());
+            respuesta.put("ruta_factura", rutaFactura);
+            respuesta.put("mensaje", "Pedido confirmado y factura generada exitosamente");
+
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al confirmar pedido: " + e.getMessage());
+            e.printStackTrace();
+
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", "Error al procesar el pedido: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+        }
+    }
+
+    /**
+     * ⚠️ DEPRECADO: Usar /pedido/confirmar en su lugar
+     * Este endpoint NO valida stock
+     */
     @PostMapping("/pedido")
-    @Operation(summary = "Agregar pedidos",
-            description = "Crea un nuevo pedido y genera la factura automáticamente")
+    @Operation(summary = "Agregar pedidos (DEPRECADO - usar /pedido/confirmar)",
+            description = "Crea un nuevo pedido y genera la factura automáticamente. NO VALIDA STOCK.")
+    @Deprecated
     public ResponseEntity<Object> agregarPedido(@RequestBody pedido Pedido) {
         try {
             // 1️⃣ Guardar el pedido en la base de datos
@@ -65,7 +131,7 @@ public class controladorPedido {
 
             // 6️⃣ Retornar respuesta con el ID del pedido
             return ResponseEntity.ok()
-                    .body(new java.util.HashMap<String, Object>() {{
+                    .body(new HashMap<String, Object>() {{
                         put("id_pedido", idPedidoNuevo);
                         put("numero_factura", Pedido.getNumero_factura());
                         put("ruta_factura", rutaFactura);
@@ -75,7 +141,7 @@ public class controladorPedido {
         } catch (Exception e) {
             System.err.println("❌ Error al agregar pedido: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new java.util.HashMap<String, String>() {{
+                    .body(new HashMap<String, String>() {{
                         put("error", "Error al procesar el pedido: " + e.getMessage());
                     }});
         }
