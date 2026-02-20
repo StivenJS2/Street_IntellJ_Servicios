@@ -1,10 +1,10 @@
 package com.example.demo.Java1.conexiones;
 
-
 import com.example.demo.Java1.Tablas.vendedor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,41 +18,41 @@ public class conexionVendedor {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // 👈 Inyectamos el PasswordEncoder
+
     public List<vendedor> obtenerVendedor() {
         String sql = "SELECT * FROM vendedor";
         return jdbcTemplate.query(sql, new RowMapper<vendedor>() {
-
             @Override
             public vendedor mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new vendedor(
-
                         rs.getInt("id_vendedor"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("correo_electronico"),
                         rs.getString("telefono"),
                         rs.getString("contrasena")
-
                 );
-
             }
         });
     }
 
-
     public void agregarVendedor(vendedor Vendedor) {
-        String sql = "INSERT INTO vendedor (nombre, apellido,correo_electronico, telefono, contrasena ) " +
+        String sql = "INSERT INTO vendedor (nombre, apellido, correo_electronico, telefono, contrasena) " +
                 "VALUES (?, ?, ?, ?, ?)";
+
+        // 👇 Hasheamos la contraseña antes de guardarla
+        String hashContrasena = passwordEncoder.encode(Vendedor.getContrasena());
+
         jdbcTemplate.update(sql,
                 Vendedor.getNombre(),
                 Vendedor.getApellido(),
                 Vendedor.getCorreo_electronico(),
                 Vendedor.getTelefono(),
-                Vendedor.getContrasena()
-
+                hashContrasena // 👈 Guardamos el hash, no el texto plano
         );
     }
-
 
     @DeleteMapping("/vendedor/{id_vendedor}")
     public void eliminarVendedor(int id_vendedor) {
@@ -62,17 +62,17 @@ public class conexionVendedor {
 
     @PutMapping("/vendedor/{id_vendedor}")
     public void actualizarVendedor(@PathVariable int id_vendedor, @RequestBody vendedor Vendedor) {
-        String sql = "UPDATE vendedor SET nombre = ?, apellido = ?,correo_electronico=?,telefono=?, contrasena=? WHERE id_vendedor = ?";
+        String sql = "UPDATE vendedor SET nombre = ?, apellido = ?, correo_electronico = ?, telefono = ?, contrasena = ? WHERE id_vendedor = ?";
+
+        // 👇 Hasheamos la contraseña si se está actualizando
+        String hashContrasena = passwordEncoder.encode(Vendedor.getContrasena());
+
         jdbcTemplate.update(sql,
                 Vendedor.getNombre(),
                 Vendedor.getApellido(),
                 Vendedor.getCorreo_electronico(),
                 Vendedor.getTelefono(),
-                Vendedor.getContrasena(),
+                hashContrasena, // 👈 Guardamos el hash
                 id_vendedor);
-
     }
-
 }
-
-
