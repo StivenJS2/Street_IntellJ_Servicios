@@ -1,6 +1,7 @@
 package com.example.demo.Java1.conexiones;
 
 import com.example.demo.Java1.Tablas.detalle_producto;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -67,5 +68,20 @@ public class conexionDetalle_producto {
                 id_detalle_producto);
 
     }
+
+// para la barra de busqueda
+    public List<detalle_producto> buscarDetallePorIdProducto(int id_producto) {
+
+        String sql = "SELECT * FROM detalle_producto WHERE id_producto = ?";
+
+        return jdbcTemplate.query(
+                sql,
+                new Object[]{id_producto},
+                new BeanPropertyRowMapper<>(detalle_producto.class)
+        );
+    }
+
+
+
 
 }

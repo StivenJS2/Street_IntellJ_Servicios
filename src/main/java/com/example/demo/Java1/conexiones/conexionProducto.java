@@ -1,6 +1,7 @@
 package com.example.demo.Java1.conexiones;
 
 import com.example.demo.Java1.Tablas.producto;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -107,6 +108,20 @@ public class conexionProducto {
                 producto.getColor(),
                 producto.getId_categoria(),
                 id_producto
+        );
+        System.out.println("Categoria recibida: " + producto.getId_categoria());
+    }
+    /**
+     * esto solo es para el boton de estado no es para nada mas
+     */
+    public List<producto> buscarPorNombre(String nombre) {
+
+        String sql = "SELECT * FROM producto WHERE LOWER(nombre) LIKE LOWER(?)";
+
+        return jdbcTemplate.query(
+                sql,
+                new Object[]{"%" + nombre + "%"},
+                new BeanPropertyRowMapper<>(producto.class)
         );
     }
 }

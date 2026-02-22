@@ -1,6 +1,7 @@
 package com.example.demo.Java1.conexiones;
 
 import com.example.demo.Java1.Tablas.cliente;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,4 +144,21 @@ public class conexionCliente {
             );
         }
     }
+// esto es la barra de busqueda no afecta en nada mas
+    public List<cliente> buscarPorDatos(String dato) {
+
+        String sql = "SELECT * FROM cliente " +
+                "WHERE LOWER(nombre) LIKE ? " +
+                "OR LOWER(apellido) LIKE ? " +
+                "OR LOWER(correo_electronico) LIKE ?";
+
+        String filtro = "%" + dato.toLowerCase() + "%";
+
+        return jdbcTemplate.query(
+                sql,
+                new Object[]{filtro, filtro, filtro},
+                new BeanPropertyRowMapper<>(cliente.class)
+        );
+    }
+
 }

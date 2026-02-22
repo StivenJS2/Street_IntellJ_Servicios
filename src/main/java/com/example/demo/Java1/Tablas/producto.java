@@ -12,6 +12,8 @@ public class producto {
     private String color;
     private int id_categoria;
 
+    public producto() {
+    }//  para poder usar la barra de busqueda
 
     public int getId_producto() {
         return id_producto;
@@ -77,7 +79,9 @@ public class producto {
 
     public int getId_categoria() {return id_categoria; }
 
-    public void setId_categoria(int categoria) {this.id_categoria = id_categoria; }
+    public void setId_categoria(int categoria) {
+        this.id_categoria = categoria;  //  usa el parámetro recibido
+    }
 
     public producto(int id_producto, String nombre, String descripcion, int cantidad, String imagen, int id_vendedor, String estado, double precio, String color, int id_categoria) {
         this.id_producto = id_producto;

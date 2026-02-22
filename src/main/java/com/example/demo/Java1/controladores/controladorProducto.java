@@ -2,6 +2,7 @@ package com.example.demo.Java1.controladores;
 
 import com.example.demo.Java1.Tablas.producto;
 import com.example.demo.Java1.conexiones.conexionProducto;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -91,6 +92,15 @@ public class controladorProducto {
     public List<Map<String, Object>> obtenerProductosPorCategoria(@PathVariable int idCategoria) {
         return Conexion.obtenerProductosPorCategoria(idCategoria);
     }
+
+    /**
+     * esto solo es para el boton de estado no es para nada mas
+     */
+    @GetMapping("/producto/buscar")
+    public List<producto> buscarProducto(@RequestParam String nombre) {
+        return Conexion.buscarPorNombre(nombre);
+    }
+
 
 
 }

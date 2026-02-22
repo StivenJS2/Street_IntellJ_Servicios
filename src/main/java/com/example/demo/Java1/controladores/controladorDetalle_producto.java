@@ -50,4 +50,12 @@ public class controladorDetalle_producto {
         return "Detalles actualizados correctamente";
     }
 
+
+//barra de busqueda
+
+    @GetMapping("/detalle_producto/buscar")
+    public List<detalle_producto> buscarDetalleProducto(@RequestParam int id_producto) {
+        return Conexion.buscarDetallePorIdProducto(id_producto);
+    }
+
 }

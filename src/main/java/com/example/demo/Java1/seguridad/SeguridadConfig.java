@@ -56,6 +56,14 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
 
                         // Productos (públicos)
+
+                        .requestMatchers("/cliente/buscar").permitAll()
+                        .requestMatchers("/detalle_producto/buscar").permitAll()
+                        .requestMatchers("/producto/buscar").permitAll()
+
+
+
+
                         .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/detalle_producto/**").permitAll()
 

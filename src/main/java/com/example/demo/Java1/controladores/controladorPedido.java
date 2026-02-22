@@ -224,4 +224,37 @@ public class controladorPedido {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    /**
+     * esto solo es para el boton de estado no es para nada mas
+     */
+    @PatchMapping("/pedido/{id}/estado")
+    public ResponseEntity<Map<String, Object>> actualizarEstado(
+            @PathVariable int id,
+            @RequestBody Map<String, String> datos) {
+
+        Map<String, Object> respuesta = new HashMap<>();
+
+        try {
+            String nuevoEstado = datos.get("estado");
+
+            Conexionpedido.actualizarEstado(id, nuevoEstado);
+
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Estado actualizado correctamente");
+
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", "Error al actualizar estado");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+        }
+    }
+
+
+
+
+
+
 }

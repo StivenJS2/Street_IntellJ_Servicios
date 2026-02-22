@@ -78,4 +78,10 @@ public class controladorCliente {
         conexion.actualizarPerfilPorCorreo(correo, datos);
         return "Perfil actualizado correctamente.";
     }
+
+// unicamente para la barra de busqueda
+    @GetMapping("/cliente/buscar")
+    public List<cliente> buscarCliente(@RequestParam String dato) {
+        return conexion.buscarPorDatos(dato);
+    }
 }

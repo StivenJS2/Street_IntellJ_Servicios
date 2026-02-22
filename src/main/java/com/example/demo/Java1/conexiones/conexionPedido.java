@@ -3,6 +3,7 @@ package com.example.demo.Java1.conexiones;
 import com.example.demo.Java1.Tablas.pedido;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -290,4 +291,17 @@ public class conexionPedido {
 
         return resultado;
     }
+    /**
+     * esto es unicamente para el boton estado no afceta nada de lo que pusieron anteriormente
+     */
+    public void actualizarEstado(int id, String estado) {
+        String sql = "UPDATE pedido SET estado = ? WHERE id_pedido = ?";
+        jdbcTemplate.update(sql, estado, id);
+    }
+
+
+
+
+
+
 }

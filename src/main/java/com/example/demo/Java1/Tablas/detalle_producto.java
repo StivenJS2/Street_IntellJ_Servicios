@@ -7,6 +7,10 @@ public class detalle_producto {
     private int id_producto;
     private int cantidad;
 
+
+    public detalle_producto() {
+    }
+
     public int getId_detalle_producto() {
         return id_detalle_producto;
     }

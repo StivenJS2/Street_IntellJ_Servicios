@@ -14,6 +14,7 @@ public class pedido {
     private String numero_factura;
     private List<Map<String, Object>> items; // 👈 NUEVO
 
+
     // Constructor completo
     public pedido(int id_pedido, int id_cliente, String fecha_pedido, Double total,
                   String estado, String metodo_pago, String ruta_factura, String numero_factura) {
