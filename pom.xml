@@ -101,6 +101,12 @@
             <version>7.2.5</version>
         </dependency>
 
+        <!-- Envio de correos -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
 
     </dependencies>
 

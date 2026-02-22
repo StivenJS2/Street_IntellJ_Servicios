@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,9 @@ public class conexionCliente {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // 👈 Inyectamos el PasswordEncoder
 
     public List<cliente> obtenerUsuarios() {
         String sql = "SELECT * FROM cliente";
@@ -50,6 +54,9 @@ public class conexionCliente {
             VALUES (?, ?, ?, ?, ?, ?)
         """;
 
+        // 👇 Hasheamos la contraseña antes de guardarla
+        String hashContrasena = passwordEncoder.encode(Cliente.getContrasena());
+
         jdbcTemplate.update(
                 sql,
                 Cliente.getNombre(),
@@ -78,11 +85,14 @@ public class conexionCliente {
             WHERE id_cliente = ?
         """;
 
+        // 👇 Hasheamos la contraseña si se está actualizando
+        String hashContrasena = passwordEncoder.encode(cliente.getContrasena());
+
         jdbcTemplate.update(
                 sql,
                 cliente.getNombre(),
                 cliente.getApellido(),
-                cliente.getContrasena(),
+                hashContrasena, // 👈 Guardamos el hash
                 cliente.getDireccion(),
                 cliente.getTelefono(),
                 cliente.getCorreo_electronico(),
@@ -122,6 +132,9 @@ public class conexionCliente {
         );
 
         if (cambiaPass) {
+            // 👇 Hasheamos la nueva contraseña
+            String hashContrasena = passwordEncoder.encode(datos.get("contrasena"));
+
             jdbcTemplate.update(
                     finalSql,
                     datos.get("nombre"),
@@ -129,7 +142,7 @@ public class conexionCliente {
                     datos.get("telefono"),
                     datos.get("direccion"),
                     datos.get("correo_electronico"),
-                    datos.get("contrasena"),
+                    hashContrasena, // 👈 Guardamos el hash
                     correo
             );
         } else {

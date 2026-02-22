@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,6 +25,12 @@ public class SeguridadConfig {
 
     @Autowired
     private JwtFiltro jwtFiltro;
+
+    // 👇 Bean de BCrypt que se inyectará en todos los servicios
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -42,7 +50,7 @@ public class SeguridadConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 👈 CAMBIO: Habilitar CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Permitir OPTIONS para CORS preflight
@@ -50,6 +58,7 @@ public class SeguridadConfig {
 
                         // Endpoints públicos
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/recuperacion/**").permitAll() // 👈 Recuperación de contraseña
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // Registro de cliente (público)
@@ -67,7 +76,7 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/detalle_producto/**").permitAll()
 
-                        // 👇 CAMBIO IMPORTANTE: PEDIDOS requieren autenticación
+                        // PEDIDOS requieren autenticación
                         .requestMatchers(HttpMethod.GET, "/pedido/**").hasAnyRole("CLIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/pedido").hasAnyRole("CLIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/pedido/**").hasRole("ADMIN")
@@ -87,7 +96,6 @@ public class SeguridadConfig {
                         .anyRequest().authenticated()
                 );
 
-        // Agregar filtro JWT ANTES del filtro de autenticación
         http.addFilterBefore(jwtFiltro, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

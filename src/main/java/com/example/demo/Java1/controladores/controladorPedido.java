@@ -224,6 +224,14 @@ public class controladorPedido {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/pedido/cliente/{id_cliente}")
+    @Operation(summary = "Obtener pedidos por cliente",
+            description = "Devuelve todos los pedidos de un cliente específico")
+    public ResponseEntity<List<pedido>> obtenerPedidosPorCliente(@PathVariable int id_cliente) {
+        List<pedido> pedidos = Conexionpedido.obtenerPedidosPorCliente(id_cliente);
+        return ResponseEntity.ok(pedidos);
+    }
     /**
      * esto solo es para el boton de estado no es para nada mas
      */
