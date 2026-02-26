@@ -3,7 +3,6 @@ package com.example.demo.Java1.Tablas;
 public class detalle_producto {
     private int id_detalle_producto;
     private String talla;
-    private String imagen;
     private int id_producto;
     private int cantidad;
 
@@ -27,14 +26,6 @@ public class detalle_producto {
         this.talla = talla;
     }
 
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
-    }
-
     public int getId_producto() {
         return id_producto;
     }
@@ -49,10 +40,9 @@ public class detalle_producto {
         this.cantidad = cantidad;
     }
 
-    public detalle_producto(int id_detalle_producto, String talla, String imagen, int id_producto, int cantidad) {
+    public detalle_producto(int id_detalle_producto, String talla, int id_producto, int cantidad) {
         this.id_detalle_producto = id_detalle_producto;
         this.talla = talla;
-        this.imagen = imagen;
         this.id_producto = id_producto;
         this.cantidad = cantidad;
 

@@ -22,7 +22,7 @@ public class AuthController {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // 👈 Inyectamos el PasswordEncoder
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Permite al usuario iniciar sesión")
@@ -33,6 +33,14 @@ public class AuthController {
         // Buscar en clientes
         Map<String, Object> usuario = buscarCliente(correo, contrasena);
         if (usuario != null) {
+            // 👇 Si la cuenta no está verificada, retornar error especial
+            if (usuario.containsKey("error")) {
+                return ResponseEntity.status(403).body(Map.of(
+                        "error", "cuenta_no_verificada",
+                        "mensaje", "Debes verificar tu correo antes de iniciar sesión.",
+                        "correo", correo
+                ));
+            }
             int idCliente = (int) usuario.get("id_cliente");
             String token = jwtUtil.generarToken(correo, "ROLE_CLIENTE", idCliente);
             return ResponseEntity.ok(respuesta(token, "cliente", usuario));
@@ -58,33 +66,39 @@ public class AuthController {
     }
 
     private Map<String, Object> buscarCliente(String correo, String contrasenaPlana) {
-        // 👇 Ya no comparamos la contraseña en el SQL, solo buscamos por correo
-        String sql = "SELECT id_cliente, nombre, apellido, correo_electronico, contrasena FROM cliente WHERE correo_electronico = ?";
+        String sql = "SELECT id_cliente, nombre, apellido, correo_electronico, contrasena, verificado FROM cliente WHERE correo_electronico = ?";
         try {
             Map<String, Object> usuario = jdbcTemplate.queryForMap(sql, correo);
             String hashGuardado = (String) usuario.get("contrasena");
 
-            // 👇 Verificamos la contraseña con BCrypt
+            System.out.println("Hash BD: " + hashGuardado);
+            System.out.println("Contraseña recibida: " + contrasenaPlana);
+            System.out.println("Coincide: " + passwordEncoder.matches(contrasenaPlana, hashGuardado));
+
             if (passwordEncoder.matches(contrasenaPlana, hashGuardado)) {
-                usuario.remove("contrasena"); // No devolvemos el hash al frontend
+                boolean verificado = (Boolean) usuario.get("verificado");
+                if (!verificado) {
+                    return Map.of("error", "cuenta_no_verificada");
+                }
+                usuario.remove("contrasena");
+                usuario.remove("verificado");
                 return usuario;
             }
             return null;
         } catch (Exception e) {
+            System.out.println("Error en buscarCliente: " + e.getMessage());
             return null;
         }
     }
 
     private Map<String, Object> buscarVendedor(String correo, String contrasenaPlana) {
-        // 👇 Ya no comparamos la contraseña en el SQL, solo buscamos por correo
         String sql = "SELECT id_vendedor, nombre, apellido, correo_electronico, contrasena FROM vendedor WHERE correo_electronico = ?";
         try {
             Map<String, Object> usuario = jdbcTemplate.queryForMap(sql, correo);
             String hashGuardado = (String) usuario.get("contrasena");
 
-            // 👇 Verificamos la contraseña con BCrypt
             if (passwordEncoder.matches(contrasenaPlana, hashGuardado)) {
-                usuario.remove("contrasena"); // No devolvemos el hash al frontend
+                usuario.remove("contrasena");
                 return usuario;
             }
             return null;
@@ -92,4 +106,5 @@ public class AuthController {
             return null;
         }
     }
+
 }

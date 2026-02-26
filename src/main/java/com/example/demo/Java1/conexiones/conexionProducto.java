@@ -55,7 +55,6 @@ public class conexionProducto {
     LEFT JOIN detalle_producto dp ON dp.id_producto = p.id_producto
     WHERE p.id_producto = ?
     """;
-        // 👆 Debe ser p.id_producto NO p.id_detalle_producto
 
         return jdbcTemplate.queryForList(sql, idProducto);
     }

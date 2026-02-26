@@ -13,7 +13,7 @@ public class producto {
     private int id_categoria;
 
     public producto() {
-    }//  para poder usar la barra de busqueda
+    }
 
     public int getId_producto() {
         return id_producto;

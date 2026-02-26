@@ -17,7 +17,7 @@ public class conexionCliente {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // 👈 Inyectamos el PasswordEncoder
+    private PasswordEncoder passwordEncoder;
 
     public List<cliente> obtenerUsuarios() {
         String sql = "SELECT * FROM cliente";
@@ -50,18 +50,18 @@ public class conexionCliente {
 
     public void agregarUsuario(cliente Cliente) {
         String sql = """
-            INSERT INTO cliente (nombre, apellido, contrasena, direccion, telefono, correo_electronico)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO cliente (nombre, apellido, contrasena, direccion, telefono, correo_electronico, verificado)
+            VALUES (?, ?, ?, ?, ?, ?, 0)
         """;
 
-        // 👇 Hasheamos la contraseña antes de guardarla
+        // ✅ Bug corregido: ahora sí se guarda el hash
         String hashContrasena = passwordEncoder.encode(Cliente.getContrasena());
 
         jdbcTemplate.update(
                 sql,
                 Cliente.getNombre(),
                 Cliente.getApellido(),
-                Cliente.getContrasena(),
+                hashContrasena,
                 Cliente.getDireccion(),
                 Cliente.getTelefono(),
                 Cliente.getCorreo_electronico()
@@ -85,14 +85,13 @@ public class conexionCliente {
             WHERE id_cliente = ?
         """;
 
-        // 👇 Hasheamos la contraseña si se está actualizando
         String hashContrasena = passwordEncoder.encode(cliente.getContrasena());
 
         jdbcTemplate.update(
                 sql,
                 cliente.getNombre(),
                 cliente.getApellido(),
-                hashContrasena, // 👈 Guardamos el hash
+                hashContrasena,
                 cliente.getDireccion(),
                 cliente.getTelefono(),
                 cliente.getCorreo_electronico(),
@@ -132,9 +131,7 @@ public class conexionCliente {
         );
 
         if (cambiaPass) {
-            // 👇 Hasheamos la nueva contraseña
             String hashContrasena = passwordEncoder.encode(datos.get("contrasena"));
-
             jdbcTemplate.update(
                     finalSql,
                     datos.get("nombre"),
@@ -142,7 +139,7 @@ public class conexionCliente {
                     datos.get("telefono"),
                     datos.get("direccion"),
                     datos.get("correo_electronico"),
-                    hashContrasena, // 👈 Guardamos el hash
+                    hashContrasena,
                     correo
             );
         } else {
@@ -157,9 +154,10 @@ public class conexionCliente {
             );
         }
     }
-// esto es la barra de busqueda no afecta en nada mas
-    public List<cliente> buscarPorDatos(String dato) {
 
+    /* ========== BARRA DE BÚSQUEDA ========== */
+
+    public List<cliente> buscarPorDatos(String dato) {
         String sql = "SELECT * FROM cliente " +
                 "WHERE LOWER(nombre) LIKE ? " +
                 "OR LOWER(apellido) LIKE ? " +
@@ -173,5 +171,4 @@ public class conexionCliente {
                 new BeanPropertyRowMapper<>(cliente.class)
         );
     }
-
 }
