@@ -30,7 +30,6 @@ public class conexionDetalle_producto {
 
                         rs.getInt("id_detalle_producto"),
                         rs.getString("talla"),
-                        rs.getString("imagen"),
                         rs.getInt("id_producto"),
                         rs.getInt("cantidad")
                 );
@@ -39,11 +38,10 @@ public class conexionDetalle_producto {
     }
 
     public void agregarDetalle_producto(detalle_producto detalle_producto) {
-        String sql = "INSERT INTO detalle_producto (talla, imagen, id_producto, cantidad) " +
+        String sql = "INSERT INTO detalle_producto (talla, id_producto, cantidad) " +
                 "VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 detalle_producto.getTalla(),
-                detalle_producto.getImagen(),
                 detalle_producto.getId_producto(),
                 detalle_producto.getCantidad()
         );
@@ -57,11 +55,10 @@ public class conexionDetalle_producto {
 
     @PutMapping("/detalle_producto/{id_detalle_producto}")
     public void actualizarDetalle_producto(@PathVariable int id_detalle_producto, @RequestBody detalle_producto detalleProducto) {
-        String sql = "UPDATE detalle_producto SET talla = ?, imagen = ?, id_producto=?, cantidad=? WHERE id_detalle_producto = ?";
+        String sql = "UPDATE detalle_producto SET talla = ?, id_producto=?, cantidad=? WHERE id_detalle_producto = ?";
         jdbcTemplate.update(sql,
 
                 detalleProducto.getTalla(),
-                detalleProducto.getImagen(),
                 detalleProducto.getId_producto(),
                 detalleProducto.getCantidad(),
 

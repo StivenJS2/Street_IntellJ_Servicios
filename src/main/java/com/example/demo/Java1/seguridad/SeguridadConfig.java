@@ -69,12 +69,14 @@ public class SeguridadConfig {
                         .requestMatchers("/cliente/buscar").permitAll()
                         .requestMatchers("/detalle_producto/buscar").permitAll()
                         .requestMatchers("/producto/buscar").permitAll()
-
-
-
-
                         .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/detalle_producto/**").permitAll()
+
+
+                        // FAVORITOS
+                        .requestMatchers(HttpMethod.GET,    "/favorito/**").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.POST,   "/favorito/**").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/favorito/**").hasRole("CLIENTE")
 
                         // PEDIDOS requieren autenticación
                         .requestMatchers(HttpMethod.GET, "/pedido/**").hasAnyRole("CLIENTE", "ADMIN")
