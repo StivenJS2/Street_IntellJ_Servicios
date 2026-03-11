@@ -58,7 +58,7 @@ public class SeguridadConfig {
 
                         // Endpoints públicos
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/recuperacion/**").permitAll() // 👈 Recuperación de contraseña
+                        .requestMatchers("/recuperacion/**").permitAll()
                         .requestMatchers("/verificacion/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
