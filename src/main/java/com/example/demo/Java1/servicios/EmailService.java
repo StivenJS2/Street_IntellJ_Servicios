@@ -17,7 +17,7 @@ public class EmailService {
     // Email de recuperación de contraseña
     // =============================================
     public void enviarEmailRecuperacion(String emailDestino, String token, String tipoUsuario) throws MessagingException {
-        String enlace = "http://localhost:8000/restablecer-contrasena?token=" + token;
+        String enlace = "http://34.225.197.89/restablecer-contrasena?token=" + token;
 
         MimeMessage mensaje = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");

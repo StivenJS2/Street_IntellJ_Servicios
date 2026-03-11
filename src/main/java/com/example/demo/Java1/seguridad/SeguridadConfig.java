@@ -35,7 +35,11 @@ public class SeguridadConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8000", "http://127.0.0.1:8000"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:8000",
+                "http://127.0.0.1:8000",
+                "http://34.225.197.89"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -58,7 +62,7 @@ public class SeguridadConfig {
 
                         // Endpoints públicos
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/recuperacion/**").permitAll() // 👈 Recuperación de contraseña
+                        .requestMatchers("/recuperacion/**").permitAll()
                         .requestMatchers("/verificacion/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 

@@ -39,7 +39,7 @@ public class conexionDetalle_producto {
 
     public void agregarDetalle_producto(detalle_producto detalle_producto) {
         String sql = "INSERT INTO detalle_producto (talla, id_producto, cantidad) " +
-                "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?)";
         jdbcTemplate.update(sql,
                 detalle_producto.getTalla(),
                 detalle_producto.getId_producto(),
