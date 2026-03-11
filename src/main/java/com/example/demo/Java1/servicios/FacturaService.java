@@ -29,7 +29,7 @@ import java.util.Map;
 public class FacturaService {
 
     private static final String FACTURAS_DIR = "uploads/facturas";
-    private static final String STORAGE_PATH = "C:/xampp/htdocs/Street_Laravel/public/storage/";
+    private static final String STORAGE_PATH = "C:/Street_Laravel/public/storage/";
 
     // Colores - Blanco y Gris
     private static final DeviceRgb COLOR_GRIS_OSCURO = new DeviceRgb(80, 80, 80);
