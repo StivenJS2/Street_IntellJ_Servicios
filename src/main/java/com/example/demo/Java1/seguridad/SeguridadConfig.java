@@ -26,7 +26,6 @@ public class SeguridadConfig {
     @Autowired
     private JwtFiltro jwtFiltro;
 
-    // 👇 Bean de BCrypt que se inyectará en todos los servicios
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -70,34 +69,33 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
 
                         // Productos (públicos)
-
                         .requestMatchers("/cliente/buscar").permitAll()
                         .requestMatchers("/detalle_producto/buscar").permitAll()
                         .requestMatchers("/producto/buscar").permitAll()
                         .requestMatchers(HttpMethod.GET, "/producto/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/detalle_producto/**").permitAll()
 
-
                         // FAVORITOS
-                        .requestMatchers(HttpMethod.GET,    "/favorito/**").hasRole("CLIENTE")
-                        .requestMatchers(HttpMethod.POST,   "/favorito/**").hasRole("CLIENTE")
-                        .requestMatchers(HttpMethod.DELETE, "/favorito/**").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.GET,    "/favorito/**").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.POST,   "/favorito/**").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/favorito/**").hasAuthority("ROLE_CLIENTE")
 
-                        // PEDIDOS requieren autenticación
-                        .requestMatchers(HttpMethod.GET, "/pedido/**").hasAnyRole("CLIENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/pedido").hasAnyRole("CLIENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/pedido/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/pedido/**").hasRole("ADMIN")
+                        // PEDIDOS
+                        .requestMatchers(HttpMethod.GET, "/pedido/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/pedido/confirmar").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/pedido").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/pedido/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/pedido/**").hasAuthority("ROLE_ADMIN")
 
                         // Perfil de cliente
-                        .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasRole("CLIENTE")
-                        .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasRole("CLIENTE")
-                        .requestMatchers("/carrito/**").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers("/carrito/**").hasAuthority("ROLE_CLIENTE")
 
                         // Rutas de administrador
-                        .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/**").hasAuthority("ROLE_ADMIN")
 
                         // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
