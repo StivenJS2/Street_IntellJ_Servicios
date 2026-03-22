@@ -43,17 +43,18 @@ public class conexionProducto {
     // 🔹 Detalle de producto + tallas (MODAL)
     public List<Map<String, Object>> obtenerDetalleProducto(int idProducto) {
         String sql = """
-    SELECT 
-        p.nombre,
-        p.descripcion,
-        p.color,
-        p.precio,
-        p.imagen,
-        dp.talla,
-        dp.id_detalle_producto
-    FROM producto p
-    LEFT JOIN detalle_producto dp ON dp.id_producto = p.id_producto
-    WHERE p.id_producto = ?
+        SELECT 
+            p.nombre,
+            p.descripcion,
+            p.color,
+            p.precio,
+            p.imagen,
+            dp.talla,
+            dp.id_detalle_producto,
+            dp.cantidad
+        FROM producto p
+        LEFT JOIN detalle_producto dp ON dp.id_producto = p.id_producto
+        WHERE p.id_producto = ?
     """;
 
         return jdbcTemplate.queryForList(sql, idProducto);

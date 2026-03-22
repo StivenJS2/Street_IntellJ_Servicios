@@ -27,6 +27,8 @@ public class conexionCliente {
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("contrasena"),
+                        rs.getString("departamento"),
+                        rs.getString("municipio"),
                         rs.getString("direccion"),
                         rs.getString("telefono"),
                         rs.getString("correo_electronico")
@@ -37,10 +39,12 @@ public class conexionCliente {
     public cliente obtenerClientePorId(int id_cliente) {
         String sql = "SELECT * FROM cliente WHERE id_cliente = ?";
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-            cliente c = new cliente();
+            cliente c = new cliente(rs.getInt("id_cliente"), rs.getString("nombre"), rs.getString("apellido"),  rs.getString("contrasena"), rs.getString("departamento"), rs.getString("municipio"), rs.getString("direccion"), rs.getString("telefono"), rs.getString("correo_electronico"));
             c.setId_cliente(rs.getInt("id_cliente"));
             c.setNombre(rs.getString("nombre"));
             c.setApellido(rs.getString("apellido"));
+            c.setDepartamento(rs.getString("departamento"));
+            c.setMunicipio(rs.getString("municipio"));
             c.setDireccion(rs.getString("direccion"));
             c.setTelefono(rs.getString("telefono"));
             c.setCorreo_electronico(rs.getString("correo_electronico"));
@@ -50,8 +54,8 @@ public class conexionCliente {
 
     public void agregarUsuario(cliente Cliente) {
         String sql = """
-            INSERT INTO cliente (nombre, apellido, contrasena, direccion, telefono, correo_electronico, verificado)
-            VALUES (?, ?, ?, ?, ?, ?, 0)
+            INSERT INTO cliente (nombre, apellido, contrasena, departamento, municipio, direccion, telefono, correo_electronico, verificado)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
         """;
 
         // ✅ Bug corregido: ahora sí se guarda el hash
@@ -62,6 +66,8 @@ public class conexionCliente {
                 Cliente.getNombre(),
                 Cliente.getApellido(),
                 hashContrasena,
+                Cliente.getDepartamento(),
+                Cliente.getMunicipio(),
                 Cliente.getDireccion(),
                 Cliente.getTelefono(),
                 Cliente.getCorreo_electronico()
@@ -79,6 +85,8 @@ public class conexionCliente {
                 nombre = ?,
                 apellido = ?,
                 contrasena = ?,
+                departamento = ?,
+                municipio = ?,
                 direccion = ?,
                 telefono = ?,
                 correo_electronico = ?
@@ -92,6 +100,8 @@ public class conexionCliente {
                 cliente.getNombre(),
                 cliente.getApellido(),
                 hashContrasena,
+                cliente.getDepartamento(),
+                cliente.getMunicipio(),
                 cliente.getDireccion(),
                 cliente.getTelefono(),
                 cliente.getCorreo_electronico(),
@@ -103,7 +113,7 @@ public class conexionCliente {
 
     public Map<String, Object> obtenerPerfilPorCorreo(String correo) {
         String sql = """
-            SELECT nombre, apellido, correo_electronico, telefono, direccion
+            SELECT nombre, apellido, correo_electronico, telefono, direccion, departamento, municipio
             FROM cliente
             WHERE correo_electronico = ?
         """;
@@ -120,6 +130,8 @@ public class conexionCliente {
                 apellido = ?,
                 telefono = ?,
                 direccion = ?,
+                departamento = ?,
+                municipio = ?,
                 correo_electronico = ?
                 %s
             WHERE correo_electronico = ?
@@ -138,6 +150,8 @@ public class conexionCliente {
                     datos.get("apellido"),
                     datos.get("telefono"),
                     datos.get("direccion"),
+                    datos.get("departamento"),
+                    datos.get("municipio"),
                     datos.get("correo_electronico"),
                     hashContrasena,
                     correo
@@ -149,6 +163,8 @@ public class conexionCliente {
                     datos.get("apellido"),
                     datos.get("telefono"),
                     datos.get("direccion"),
+                    datos.get("departamento"),
+                    datos.get("municipio"),
                     datos.get("correo_electronico"),
                     correo
             );

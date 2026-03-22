@@ -56,7 +56,7 @@ public class SeguridadConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir OPTIONS para CORS preflight
+                        // OPTIONS siempre primero
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Endpoints públicos
@@ -64,11 +64,7 @@ public class SeguridadConfig {
                         .requestMatchers("/recuperacion/**").permitAll()
                         .requestMatchers("/verificacion/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
-                        // Registro de cliente (público)
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
-
-                        // Productos (públicos)
                         .requestMatchers("/cliente/buscar").permitAll()
                         .requestMatchers("/detalle_producto/buscar").permitAll()
                         .requestMatchers("/producto/buscar").permitAll()
@@ -80,24 +76,25 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.POST,   "/favorito/**").hasAuthority("ROLE_CLIENTE")
                         .requestMatchers(HttpMethod.DELETE, "/favorito/**").hasAuthority("ROLE_CLIENTE")
 
-                        // PEDIDOS
-                        .requestMatchers(HttpMethod.GET, "/pedido/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/pedido/confirmar").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/pedido").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/pedido/**").hasAuthority("ROLE_ADMIN")
+                        // PEDIDOS (específicos antes que el /** general)
+                        .requestMatchers(HttpMethod.GET,    "/pedido/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/pedido/confirmar").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/pedido").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT,    "/pedido/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/pedido/**").hasAuthority("ROLE_ADMIN")
 
-                        // Perfil de cliente
-                        .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
-                        .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
+                        // CARRITO
                         .requestMatchers("/carrito/**").hasAuthority("ROLE_CLIENTE")
 
-                        // Rutas de administrador
-                        .requestMatchers(HttpMethod.POST, "/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/**").hasAuthority("ROLE_ADMIN")
+                        // PERFIL CLIENTE
+                        .requestMatchers(HttpMethod.GET, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/cliente/perfil").hasAuthority("ROLE_CLIENTE")
+
+                        // Admin al final (catchall)
+                        .requestMatchers(HttpMethod.POST,   "/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT,    "/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/**").hasAuthority("ROLE_ADMIN")
 
-                        // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 );
 

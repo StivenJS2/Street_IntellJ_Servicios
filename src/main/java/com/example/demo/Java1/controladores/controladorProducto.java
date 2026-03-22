@@ -77,6 +77,7 @@ public class controladorProducto {
                 Map<String, Object> detalle = new HashMap<>();
                 detalle.put("talla", fila.get("talla"));
                 detalle.put("id_detalle_producto", fila.get("id_detalle_producto"));
+                detalle.put("cantidad", fila.get("cantidad")); // ← línea nueva
                 detalles.add(detalle);
             }
         }
